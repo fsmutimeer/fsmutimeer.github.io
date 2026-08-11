@@ -173,6 +173,49 @@ h1 em { color: var(--acid); font-style: normal; }
 .principle-icon { margin-bottom: 25px; color: var(--cyan); }
 .principle h3 { margin: 0 0 10px; font-size: 17px; }
 .principle p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.platform-spine { margin-top: 112px; padding-top: 74px; border-top: 1px solid var(--line); }
+.platform-spine-head { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 46px; }
+.technology-explorer { display: grid; grid-template-columns: 1.35fr .65fr; gap: 18px; }
+.technology-logos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.technology-card { min-height: 190px; display: flex; flex-direction: column; align-items: flex-start; padding: 20px 17px; border: 1px solid var(--line); cursor: pointer; background: rgb(16 35 31 / 48%); color: var(--ink); text-align: left; transition: border-color .25s ease, background .25s ease, transform .25s ease, box-shadow .25s ease; }
+.technology-card:hover, .technology-card:focus-visible { border-color: #547d68; background: rgb(22 50 42 / 72%); transform: translateY(-4px); }
+.technology-card.is-active { border-color: var(--acid); background: linear-gradient(145deg, rgb(200 243 106 / 11%), rgb(16 35 31 / 72%)); box-shadow: inset 0 -3px 0 var(--acid); }
+.technology-icon { width: 28px; height: 28px; margin-bottom: 28px; color: var(--acid); }
+.technology-card:nth-child(2) .technology-icon { color: var(--amber); }
+.technology-card:nth-child(3) .technology-icon { color: var(--cyan); }
+.technology-card:nth-child(4) .technology-icon { color: #f47a82; }
+.technology-name { font-size: 16px; font-weight: 700; letter-spacing: -.04em; }
+.technology-label { margin-top: 7px; color: var(--acid); font-size: 9px; letter-spacing: .07em; text-transform: uppercase; }
+.technology-copy { margin-top: 13px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.technology-detail { position: relative; min-height: 190px; padding: 20px 22px; border: 1px solid #3d6556; background: #0d1c19; box-shadow: 12px 14px 0 rgb(19 43 36 / 45%); }
+.technology-detail::before { content: ''; position: absolute; top: 0; right: 0; width: 45%; height: 1px; background: var(--acid); }
+.technology-detail-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.signal-pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 0 4px rgb(200 243 106 / 11%); }
+.technology-detail h3 { margin: 35px 0 10px; font-size: 26px; letter-spacing: -.06em; }
+.technology-detail h3 span { color: var(--acid); }
+.technology-detail p { margin: 0; color: #a7bab4; font-size: 12px; line-height: 1.7; }
+.technology-detail-route { display: block; margin-top: 23px; color: #5f8878; font-size: 10px; }
+.lifecycle-explorer { margin-top: 70px; padding: 28px; border: 1px solid #28473b; background: rgb(13 28 25 / 76%); }
+.lifecycle-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.lifecycle-heading .section-label { margin-bottom: 0; }
+.lifecycle-status { display: flex; align-items: center; gap: 8px; color: var(--acid); font-size: 10px; text-transform: uppercase; }
+.lifecycle-status span { width: 6px; height: 6px; border-radius: 50%; background: var(--acid); }
+.lifecycle-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 28px; }
+.lifecycle-step { min-height: 90px; padding: 13px 14px; border: 1px solid var(--line); cursor: pointer; background: transparent; color: var(--muted); text-align: left; transition: border-color .2s ease, color .2s ease, background .2s ease; }
+.lifecycle-step:hover, .lifecycle-step:focus-visible { border-color: #547d68; color: var(--ink); }
+.lifecycle-step.is-active { border-color: var(--acid); background: rgb(200 243 106 / 7%); color: var(--ink); }
+.lifecycle-step-top { display: flex; align-items: center; justify-content: space-between; color: #547369; font-size: 10px; }
+.lifecycle-step.is-active .lifecycle-step-top { color: var(--acid); }
+.lifecycle-step strong { display: block; margin-top: 18px; font-size: 14px; letter-spacing: -.03em; }
+.lifecycle-track { height: 1px; margin: 18px 12.5% 0; background: #2c4d40; }
+.lifecycle-track span { display: block; height: 2px; background: var(--acid); transition: width .35s ease; }
+.lifecycle-panel { display: grid; grid-template-columns: 1.2fr .8fr; gap: 35px; padding-top: 28px; }
+.lifecycle-command { color: var(--ink); font-size: 12px; }
+.lifecycle-command .prompt { margin-right: 5px; }
+.lifecycle-panel p { max-width: 560px; margin: 14px 0 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.lifecycle-outcome { display: flex; flex-direction: column; gap: 10px; padding-left: 20px; border-left: 1px solid var(--line); }
+.lifecycle-outcome span { color: var(--acid); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+.lifecycle-outcome strong { color: var(--ink); font-size: 13px; line-height: 1.55; }
 .now { position: relative; overflow: hidden; background: #0e211c; scroll-margin-top: 75px; }
 .now::after { content: 'OPEN'; position: absolute; right: -15px; bottom: -55px; color: rgb(200 243 106 / 3.5%); font-size: 190px; font-weight: 800; line-height: 1; letter-spacing: -.12em; }
 .now-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 90px; align-items: end; }
@@ -227,6 +270,19 @@ footer { display: flex; justify-content: space-between; padding: 28px 0; color: 
   .principles { display: block; margin-top: 42px; }
   .principle, .principle:nth-child(2), .principle:nth-child(3) { min-height: auto; margin: 0 0 12px; }
   .stack-list { margin-top: 50px; }
+  .platform-spine { margin-top: 78px; padding-top: 54px; }
+  .platform-spine-head { display: block; margin-bottom: 32px; }
+  .technology-explorer { display: block; }
+  .technology-logos { grid-template-columns: repeat(2, 1fr); }
+  .technology-card { min-height: 160px; padding: 16px 14px; }
+  .technology-icon { margin-bottom: 20px; }
+  .technology-detail { margin-top: 14px; box-shadow: 8px 10px 0 rgb(19 43 36 / 45%); }
+  .lifecycle-explorer { margin-top: 48px; padding: 20px 16px; }
+  .lifecycle-heading { align-items: flex-start; flex-direction: column; gap: 13px; }
+  .lifecycle-steps { grid-template-columns: repeat(2, 1fr); }
+  .lifecycle-track { display: none; }
+  .lifecycle-panel { display: block; padding-top: 26px; }
+  .lifecycle-outcome { margin-top: 22px; padding: 17px 0 0; border-top: 1px solid var(--line); border-left: 0; }
   .now-grid .contact { display: block; margin-top: 48px; }
   .contact-note { margin-top: 20px; }
   footer { display: block; }

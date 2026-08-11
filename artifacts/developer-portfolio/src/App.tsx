@@ -9,6 +9,7 @@ import {
   Container,
   Cpu,
   ExternalLink,
+  GitBranch,
   Github,
   Globe2,
   Mail,
@@ -16,11 +17,14 @@ import {
   Menu,
   Network,
   Radio,
+  Rocket,
   ShieldCheck,
   Terminal,
   X,
   type LucideIcon,
 } from 'lucide-react';
+import { SiKubernetes, SiPrometheus, SiQuarkus, SiRedhatopenshift } from 'react-icons/si';
+import type { IconType } from 'react-icons';
 import './index.css';
 
 type Project = {
@@ -78,6 +82,89 @@ const stack: [string, string, string, LucideIcon][] = [
   ['04', 'Observability', 'Signals that explain what happened, not just that something did.', Network],
 ];
 
+type Technology = {
+  name: string;
+  label: string;
+  copy: string;
+  detail: string;
+  Icon: IconType;
+};
+
+const technologyLogos: Technology[] = [
+  {
+    name: 'Quarkus',
+    label: 'Java runtime',
+    copy: 'Fast startup. Small footprint.',
+    detail: 'I use Quarkus to keep Java services close to the platform: fast boot, native-friendly builds, clear health contracts, and less friction when a service becomes a container.',
+    Icon: SiQuarkus,
+  },
+  {
+    name: 'OpenShift',
+    label: 'Application platform',
+    copy: 'Guardrails that help teams ship.',
+    detail: 'OpenShift turns Kubernetes primitives into a paved road for application teams. The useful work is making delivery, security, and operations feel like one coherent system.',
+    Icon: SiRedhatopenshift,
+  },
+  {
+    name: 'Kubernetes',
+    label: 'Cluster foundation',
+    copy: 'The primitives behind the promise.',
+    detail: 'Kubernetes is where workload intent becomes operational reality: scheduling, rollout strategy, service discovery, resource boundaries, and the failure modes that need a plan.',
+    Icon: SiKubernetes,
+  },
+  {
+    name: 'Prometheus',
+    label: 'Operational signal',
+    copy: 'Metrics with a reason to exist.',
+    detail: 'Good monitoring is not more charts. It is a small set of signals tied to user impact, release context, and an explicit action when the system drifts.',
+    Icon: SiPrometheus,
+  },
+];
+
+type LifecycleStage = {
+  number: string;
+  name: string;
+  command: string;
+  copy: string;
+  outcome: string;
+  Icon: LucideIcon;
+};
+
+const lifecycle: LifecycleStage[] = [
+  {
+    number: '01',
+    name: 'Design',
+    command: 'git checkout --track',
+    copy: 'Start with a service boundary, a clear contract, and the failure modes worth making visible.',
+    outcome: 'A small, testable Java service with an owner.',
+    Icon: GitBranch,
+  },
+  {
+    number: '02',
+    name: 'Build',
+    command: './mvnw quarkus:build',
+    copy: 'Compile, test, scan, and package the service into an artifact that can move the same way everywhere.',
+    outcome: 'A reproducible container image with release metadata.',
+    Icon: Braces,
+  },
+  {
+    number: '03',
+    name: 'Promote',
+    command: 'oc apply -k overlays/prod',
+    copy: 'Use GitOps and OpenShift policy to move from a known commit to a healthy workload without heroics.',
+    outcome: 'A controlled rollout with a rollback path.',
+    Icon: Rocket,
+  },
+  {
+    number: '04',
+    name: 'Observe',
+    command: 'kubectl get signal',
+    copy: 'Connect traces, metrics, logs, and release markers so the team can explain what changed.',
+    outcome: 'A platform that tells the truth under pressure.',
+    Icon: Network,
+  },
+];
+
 function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) {
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -106,6 +193,8 @@ function Pill({ children }: { children: ReactNode }) {
 function Portfolio() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedTechnology, setSelectedTechnology] = useState<Technology>(technologyLogos[0]);
+  const [selectedStage, setSelectedStage] = useState(0);
 
   const closeMenu = () => setMenuOpen(false);
   const openBrief = (project: Project) => setSelectedProject(project);
@@ -237,6 +326,77 @@ function Portfolio() {
             <Reveal delay={160}><div className="principle" data-testid="card-principle-reliability"><ShieldCheck className="principle-icon" size={22} aria-hidden="true" /><h3>Reliability is a feature</h3><p>Health checks, graceful failure, and delivery signals are part of the design—not cleanup.</p></div></Reveal>
             <Reveal delay={240}><div className="principle" data-testid="card-principle-practical"><Cpu className="principle-icon" size={22} aria-hidden="true" /><h3>Curious, then practical</h3><p>I like new tools. I like them more when they make tomorrow’s incident smaller.</p></div></Reveal>
           </div>
+          <Reveal delay={80}>
+            <div className="platform-spine" id="platform" aria-labelledby="platform-heading">
+              <div className="platform-spine-head">
+                <div>
+                  <div className="section-label mono">03 / platform spine</div>
+                  <h2 className="section-title" id="platform-heading">From commit to a signal you can trust.</h2>
+                </div>
+                <p className="section-intro">The tools matter. The handoffs between them matter more. Explore the pieces and follow the software life cycle all the way to production.</p>
+              </div>
+              <div className="technology-explorer">
+                <div className="technology-logos" role="list" aria-label="Platform technologies">
+                  {technologyLogos.map(({ name, label, copy, Icon }) => (
+                    <button
+                      className={`technology-card ${selectedTechnology.name === name ? 'is-active' : ''}`}
+                      type="button"
+                      key={name}
+                      role="listitem"
+                      aria-pressed={selectedTechnology.name === name}
+                      data-testid={`button-technology-${name.toLowerCase()}`}
+                      onClick={() => setSelectedTechnology(technologyLogos.find((technology) => technology.name === name) ?? technologyLogos[0])}
+                    >
+                      <Icon className="technology-icon" aria-hidden="true" />
+                      <span className="technology-name">{name}</span>
+                      <span className="technology-label mono">{label}</span>
+                      <span className="technology-copy">{copy}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="technology-detail" aria-live="polite" data-testid="panel-technology-detail">
+                  <div className="technology-detail-top">
+                    <span className="mono">{selectedTechnology.label}</span>
+                    <span className="signal-pulse" aria-hidden="true" />
+                  </div>
+                  <h3>{selectedTechnology.name}<span>.</span></h3>
+                  <p>{selectedTechnology.detail}</p>
+                  <span className="technology-detail-route mono">/platform/{selectedTechnology.name.toLowerCase()}</span>
+                </div>
+              </div>
+              <div className="lifecycle-explorer">
+                <div className="lifecycle-heading">
+                  <div className="section-label mono">software life cycle</div>
+                  <span className="mono lifecycle-status"><span /> pipeline healthy</span>
+                </div>
+                <div className="lifecycle-steps" role="tablist" aria-label="Software lifecycle stages">
+                  {lifecycle.map(({ number, name, Icon }, index) => (
+                    <button
+                      className={`lifecycle-step ${selectedStage === index ? 'is-active' : ''}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={selectedStage === index}
+                      aria-controls={`lifecycle-panel-${number}`}
+                      key={number}
+                      data-testid={`button-lifecycle-${name.toLowerCase()}`}
+                      onClick={() => setSelectedStage(index)}
+                    >
+                      <span className="lifecycle-step-top"><span className="mono">{number}</span><Icon size={16} aria-hidden="true" /></span>
+                      <strong>{name}</strong>
+                    </button>
+                  ))}
+                </div>
+                <div className="lifecycle-track" aria-hidden="true"><span style={{ width: `${(selectedStage / (lifecycle.length - 1)) * 100}%` }} /></div>
+                <div className="lifecycle-panel" id={`lifecycle-panel-${lifecycle[selectedStage].number}`} role="tabpanel" aria-live="polite" data-testid="panel-lifecycle-stage">
+                  <div>
+                    <span className="mono lifecycle-command"><span className="prompt">$</span> {lifecycle[selectedStage].command}</span>
+                    <p>{lifecycle[selectedStage].copy}</p>
+                  </div>
+                  <div className="lifecycle-outcome"><span className="mono">output</span><strong>{lifecycle[selectedStage].outcome}</strong></div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
