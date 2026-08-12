@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { withBasePath } from '@/lib/base-path';
 import { profile } from '@/lib/profile';
 import './globals.css';
 
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       'Code that survives production. Java, Quarkus, OpenShift, Kubernetes, observability, and CI/CD.',
   },
-  icons: { icon: '/favicon.svg' },
+  icons: { icon: withBasePath('/favicon.svg') },
 };
 
 const jsonLd = {

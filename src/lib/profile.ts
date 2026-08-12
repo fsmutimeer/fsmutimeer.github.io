@@ -1,3 +1,5 @@
+import { withBasePath } from '@/lib/base-path';
+
 export const profile = {
   name: 'Feroz Shah',
   initials: 'FS',
@@ -10,7 +12,7 @@ export const profile = {
   githubUrl: 'https://github.com/fsmutimeer',
   linkedinUrl: 'https://www.linkedin.com/in/fsmutimeer/',
   photo: {
-    src: '/feroz.png',
+    src: withBasePath('/feroz.png'),
     alt: 'Feroz Shah, platform engineer',
   },
   about: {
