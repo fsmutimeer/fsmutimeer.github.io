@@ -171,6 +171,7 @@ const lifecycle: LifecycleStage[] = [
 ];
 
 const navItems = [
+  { id: 'about', label: 'About' },
   { id: 'work', label: 'Work' },
   { id: 'approach', label: 'Approach' },
   { id: 'now', label: 'Now' },
@@ -327,11 +328,43 @@ export function Portfolio() {
         <div className="scroll-cue mono"><span /> scroll to inspect the system</div>
       </section>
 
+      <section className="section" id="about" aria-labelledby="about-heading">
+        <div className="container">
+          <div className="about-grid">
+            <Reveal>
+              <div>
+                <div className="section-label mono">01 / about</div>
+                <h2 className="section-title" id="about-heading">{profile.about.headline}</h2>
+                <p className="section-intro">{profile.about.summary}</p>
+                <div className="about-stack" aria-label="Core technologies">
+                  {profile.about.stack.map((item) => (
+                    <Pill key={item}>{item}</Pill>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={120}>
+              <div className="about-focus" data-testid="list-about-focus">
+                {profile.about.focus.map((item, index) => (
+                  <article className="about-focus-item" key={item.title} data-testid={`card-about-focus-${index + 1}`}>
+                    <span className="about-focus-no mono">{String(index + 1).padStart(2, '0')}</span>
+                    <div>
+                      <h3>{item.title}</h3>
+                      <p>{item.copy}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       <section className="section" id="work" aria-labelledby="work-heading">
         <div className="container">
           <Reveal>
             <div className="work-head">
-              <div><div className="section-label mono">01 / selected systems</div><h2 className="section-title" id="work-heading">The work behind<br />the uptime.</h2></div>
+              <div><div className="section-label mono">02 / selected systems</div><h2 className="section-title" id="work-heading">The work behind<br />the uptime.</h2></div>
               <p className="section-intro">Not a museum of logos. A field guide to the moments where good engineering made the system—and the team—calmer.</p>
             </div>
           </Reveal>
@@ -363,7 +396,7 @@ export function Portfolio() {
           <div className="split">
             <Reveal>
               <div>
-                <div className="section-label mono">02 / the capability story</div>
+                <div className="section-label mono">03 / the capability story</div>
                 <h2 className="section-title" id="approach-heading">A stack is only useful when it tells a story.</h2>
                 <p className="section-intro">I work across the seam between application code and platform reality. That means knowing what a service needs, what a cluster can promise, and where the two will disagree at 03:17.</p>
               </div>
@@ -387,7 +420,7 @@ export function Portfolio() {
             <div className="platform-spine" id="platform" aria-labelledby="platform-heading">
               <div className="platform-spine-head">
                 <div>
-                  <div className="section-label mono">03 / platform spine</div>
+                  <div className="section-label mono">04 / platform spine</div>
                   <h2 className="section-title" id="platform-heading">From commit to a signal you can trust.</h2>
                 </div>
                 <p className="section-intro">The tools matter. The handoffs between them matter more. Explore the pieces and follow the software life cycle all the way to production.</p>
@@ -461,7 +494,7 @@ export function Portfolio() {
         <div className="container now-grid">
           <Reveal>
             <div>
-              <div className="section-label mono">03 / current signal</div>
+              <div className="section-label mono">05 / current signal</div>
               <h2 className="section-title" id="now-heading">Looking for a team that ships thoughtfully.</h2>
               <p className="section-intro">I’m open to platform engineering and senior backend roles where I can work close to the code, the cluster, and the people operating both.</p>
               <div className="availability" data-testid="status-availability"><i /> available for conversations · remote / hybrid</div>
