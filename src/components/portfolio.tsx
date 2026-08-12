@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import Image from 'next/image';
 import Lenis from 'lenis';
 import {
   ArrowDownRight,
@@ -344,19 +345,34 @@ export function Portfolio() {
               </div>
             </Reveal>
             <Reveal delay={120}>
-              <div className="about-focus" data-testid="list-about-focus">
-                {profile.about.focus.map((item, index) => (
-                  <article className="about-focus-item" key={item.title} data-testid={`card-about-focus-${index + 1}`}>
-                    <span className="about-focus-no mono">{String(index + 1).padStart(2, '0')}</span>
-                    <div>
-                      <h3>{item.title}</h3>
-                      <p>{item.copy}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
+              <figure className="about-photo">
+                <Image
+                  src={profile.photo.src}
+                  alt={profile.photo.alt}
+                  width={720}
+                  height={900}
+                  className="about-photo-img"
+                  priority
+                />
+                <figcaption className="about-photo-caption mono">
+                  {profile.name} · {profile.role}
+                </figcaption>
+              </figure>
             </Reveal>
           </div>
+          <Reveal delay={80}>
+            <div className="about-focus" data-testid="list-about-focus">
+              {profile.about.focus.map((item, index) => (
+                <article className="about-focus-item" key={item.title} data-testid={`card-about-focus-${index + 1}`}>
+                  <span className="about-focus-no mono">{String(index + 1).padStart(2, '0')}</span>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.copy}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
