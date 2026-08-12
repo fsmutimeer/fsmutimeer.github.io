@@ -1,4 +1,4 @@
-/** Site base path for GitHub Pages project deploys (`/my-site`) or empty for local/custom domains. */
+/** Optional path prefix for project Pages deploys. Empty for user site at username.github.io. */
 export const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
 export function withBasePath(path: string): string {
