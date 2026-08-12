@@ -89,6 +89,7 @@
   --amber: #ffc878;
   min-height: 100dvh;
   overflow: hidden;
+  padding-top: 76px;
   background: var(--deep);
   color: var(--ink);
 }
@@ -96,16 +97,26 @@
 .mono { font-family: var(--app-font-mono); }
 .container { width: min(1160px, calc(100% - 48px)); margin-inline: auto; }
 .topbar {
-  position: sticky; top: 0; z-index: 20;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
   border-bottom: 1px solid rgb(56 94 80 / 50%);
   background: rgb(9 21 17 / 86%);
   backdrop-filter: blur(16px);
 }
-.topbar-inner { height: 76px; display: flex; align-items: center; justify-content: space-between; }
+.topbar-inner {
+  position: relative;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.04em; }
 .brand-mark { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--acid); border-radius: 50%; color: var(--acid); font: 11px var(--app-font-mono); }
 .nav { display: flex; align-items: center; gap: 30px; color: var(--muted); font: 14px var(--app-font-mono); letter-spacing: .04em; }
-.nav a, .mobile-nav a { transition: color .2s ease; text-transform: capitalize; }
+.nav a, .mobile-nav a { transition: color .2s ease; text-transform: uppercase; }
 .nav a:hover, .mobile-nav a:hover { color: var(--acid); }
 .status { display: flex; align-items: center; gap: 10px; color: var(--acid); font: 11px var(--app-font-mono); letter-spacing: .07em; text-transform: uppercase; }
 .status-dot {
