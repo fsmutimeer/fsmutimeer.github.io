@@ -1,6 +1,7 @@
 'use client';
 
 import { lifecycle, principles, stack, technologies, type Technology } from '@/lib/content';
+import { SplitTitle } from './split-title';
 
 export function Approach({
   selectedTechnology,
@@ -19,9 +20,7 @@ export function Approach({
         <div className="split">
           <div>
             <div className="section-label mono">03 / the capability story</div>
-            <h2 className="section-title" id="approach-heading">
-              The path, not the logo wall.
-            </h2>
+            <SplitTitle id="approach-heading" lines={['The path, not', 'the logo wall.']} />
             <p className="section-intro">
               Work is what shipped. This is how it moves: a service boundary, a Git commit, a
               scanned image, a pod the cluster will admit.
@@ -61,9 +60,10 @@ export function Approach({
           <div className="platform-spine-head">
             <div>
               <div className="section-label mono">04 / platform spine</div>
-              <h2 className="section-title" id="platform-heading">
-                From commit to a signal you can trust.
-              </h2>
+              <SplitTitle
+                id="platform-heading"
+                lines={['From commit to a', 'signal you can trust.']}
+              />
             </div>
             <p className="section-intro">
               The tools matter. The handoffs between them matter more. Pick a piece, then walk the

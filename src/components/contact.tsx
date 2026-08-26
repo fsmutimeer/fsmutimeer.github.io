@@ -6,6 +6,7 @@ import { FaLinkedinIn } from 'react-icons/fa';
 import { profile } from '@/lib/profile';
 import { scrambleTo } from '@/lib/scramble';
 import { Magnetic } from './magnetic';
+import { SplitTitle } from './split-title';
 
 export function Contact() {
   const copyrightRef = useRef<HTMLSpanElement>(null);
@@ -31,9 +32,10 @@ export function Contact() {
       <div className="container now-grid">
         <div>
           <div className="section-label mono">05 / current signal</div>
-          <h2 className="section-title" id="now-heading">
-            Currently shipping at {profile.company}
-          </h2>
+          <SplitTitle
+            id="now-heading"
+            lines={['Currently shipping at', profile.company]}
+          />
           <p className="section-intro">
             Backend and platform work in {profile.location} — Quarkus services, OpenShift clusters, and
             the GitOps path between them. If you have a hard service or cluster problem, tell me
@@ -155,6 +157,9 @@ export function Contact() {
             <span className="footer-meta" data-testid="text-location" title={profile.location}>
               <MapPin size={24} aria-hidden="true" />
               <span>{profile.timezone}</span>
+            </span>
+            <span className="footer-meta footer-inspect" title="Toggle layout inspect grid">
+              ALT+G inspect
             </span>
           </div>
         </footer>

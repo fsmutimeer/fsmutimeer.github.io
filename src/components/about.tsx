@@ -1,17 +1,19 @@
 'use client';
 
 import { profile } from '@/lib/profile';
+import { SplitTitle } from './split-title';
 
 export function About() {
   return (
     <section className="section about" id="about" aria-labelledby="about-heading">
       <div className="container">
         <div className="about-grid">
-          <div>
+          <div className="about-copy">
             <div className="section-label mono">01 / about</div>
-            <h2 className="section-title" id="about-heading">
-              {profile.about.headline}
-            </h2>
+            <SplitTitle
+              id="about-heading"
+              lines={['Engineer at the seam', 'of services and platforms.']}
+            />
             <p className="section-intro">{profile.about.summary}</p>
             <p className="section-intro about-education mono">{profile.about.education}</p>
             <div className="about-stack" aria-label="Core technologies">

@@ -15,6 +15,7 @@ import { Approach } from './approach';
 import { Contact } from './contact';
 import { Cursor } from './cursor';
 import { Hero } from './hero';
+import { InspectGrid } from './inspect-grid';
 import { Nav } from './nav';
 import { Preloader } from './preloader';
 import { SceneFallback } from './scene/fallback';
@@ -32,6 +33,7 @@ export function Portfolio() {
   const reducedMotion = usePrefersReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [briefOrigin, setBriefOrigin] = useState<DOMRect | null>(null);
   const [selectedTechnology, setSelectedTechnology] = useState<Technology>(technologies[0]);
   const [selectedStage, setSelectedStage] = useState(0);
   const [ready, setReady] = useState(false);
@@ -200,7 +202,19 @@ export function Portfolio() {
         ease: 'power3.out',
       });
 
-      gsap.utils.toArray<HTMLElement>('.section-title, .section-intro, .about-focus-item, .stack-item, .principle, .technology-card, .lifecycle-step').forEach((node, index) => {
+      gsap.utils.toArray<HTMLElement>('.section-title').forEach((title) => {
+        const lines = title.querySelectorAll('.line');
+        if (!lines.length) return;
+        gsap.from(lines, {
+          yPercent: 110,
+          duration: 0.95,
+          stagger: 0.08,
+          ease: 'power4.out',
+          scrollTrigger: { trigger: title, start: 'top 88%' },
+        });
+      });
+
+      gsap.utils.toArray<HTMLElement>('.section-intro, .about-focus-item, .stack-item, .principle, .technology-card, .lifecycle-step').forEach((node, index) => {
         gsap.from(node, {
           opacity: 0,
           y: 28,
@@ -211,12 +225,20 @@ export function Portfolio() {
         });
       });
 
+      ScrollTrigger.create({
+        trigger: '#work',
+        start: 'top center',
+        end: 'bottom center',
+        onEnter: () => setSection('work'),
+        onEnterBack: () => setSection('work'),
+      });
+
       const mm = gsap.matchMedia();
       mm.add('(min-width: 900px)', () => {
         const track = document.querySelector('.work-track') as HTMLElement | null;
         const pin = document.querySelector('.work-pin') as HTMLElement | null;
         if (!track || !pin) return;
-        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 80);
+        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 160);
         gsap.to(track, {
           x: () => -distance(),
           ease: 'none',
@@ -240,6 +262,27 @@ export function Portfolio() {
             },
           },
         });
+      });
+      mm.add('(max-width: 899px)', () => {
+        const panels = gsap.utils.toArray<HTMLElement>('.work-panel');
+        if (!panels.length) return;
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+            const index = visible
+              ? Number((visible.target as HTMLElement).dataset.workIndex ?? 0)
+              : 0;
+            sceneState.set({
+              section: 'work',
+              workIndex: Math.min(projects.length - 1, Math.max(0, index)),
+            });
+          },
+          { rootMargin: '-30% 0px -40% 0px', threshold: [0.25, 0.5, 0.75] },
+        );
+        panels.forEach((panel) => observer.observe(panel));
+        return () => observer.disconnect();
       });
 
       ScrollTrigger.refresh();
@@ -267,10 +310,16 @@ export function Portfolio() {
         </ErrorBoundary>
       )}
       <div className="grain" aria-hidden="true" />
+      <InspectGrid ready={ready || reducedMotion} />
       <Nav menuOpen={menuOpen} onToggle={() => setMenuOpen((open) => !open)} onClose={closeMenu} />
       <Hero ready={ready || reducedMotion} />
       <About />
-      <Work onOpenBrief={setSelectedProject} />
+      <Work
+        onOpenBrief={(project, origin) => {
+          setBriefOrigin(origin);
+          setSelectedProject(project);
+        }}
+      />
       <Approach
         selectedTechnology={selectedTechnology}
         selectedStage={selectedStage}
@@ -279,7 +328,14 @@ export function Portfolio() {
       />
       <Contact />
       {selectedProject && (
-        <BriefDialog project={selectedProject} onClose={() => setSelectedProject(null)} />
+        <BriefDialog
+          project={selectedProject}
+          origin={briefOrigin}
+          onClose={() => {
+            setSelectedProject(null);
+            setBriefOrigin(null);
+          }}
+        />
       )}
     </main>
   );

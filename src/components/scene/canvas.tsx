@@ -34,12 +34,12 @@ function CameraRig() {
       desired.set(1.35, 0.45, 5.7);
       look.set(0, 0.1, 0);
     } else if (section === 'about') {
-      desired.set(-4.1, 1.05, 6.4);
-      look.set(0.45, 0.1, 0);
+      desired.set(-5.2, 1.12, 6.9);
+      look.set(1.15, 0.08, 0);
     } else {
       const mobile = snapshot.isMobile;
-      desired.set(mobile ? 0.15 : 0.45, mobile ? 1.55 : 1.32, mobile ? 9.4 : 8.85);
-      look.set(mobile ? 0.1 : -1.85, 0.12, 0);
+      desired.set(mobile ? 0.15 : 0.1, mobile ? 1.55 : 1.32, mobile ? 9.4 : 9.05);
+      look.set(mobile ? 0.1 : -2.2, 0.12, 0);
     }
 
     desired.x += mouseX * 0.55;

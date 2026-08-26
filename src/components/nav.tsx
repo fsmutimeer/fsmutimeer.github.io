@@ -7,6 +7,7 @@ import { navItems } from '@/lib/content';
 import { profile } from '@/lib/profile';
 import { Magnetic } from './magnetic';
 import { scrambleTo } from '@/lib/scramble';
+import { requestInspectFrame } from './inspect-grid';
 
 const sections = [
   { id: 'top', label: 'Home', preview: 'Code that survives production.' },
@@ -40,6 +41,8 @@ export function Nav({
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLElement>(null);
+  const maskRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState('top');
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -95,6 +98,57 @@ export function Nav({
     if (!menuOpen) setHoveredId(null);
   }, [menuOpen]);
 
+  useEffect(() => {
+    const list = listRef.current;
+    const mask = maskRef.current;
+    if (!menuOpen || !list || !mask) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.matchMedia('(pointer: coarse)').matches) {
+      gsap.set(mask, { autoAlpha: 0 });
+      return;
+    }
+
+    const target = list.querySelector<HTMLElement>(
+      `.nav-overlay-link[href="#${previewId}"]`,
+    );
+    if (!target) return;
+
+    const place = (duration: number) => {
+      const listRect = list.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      gsap.set(mask, { autoAlpha: 1 });
+      gsap.to(mask, {
+        x: targetRect.left - listRect.left,
+        y: targetRect.top - listRect.top,
+        width: targetRect.width,
+        height: targetRect.height,
+        duration,
+        ease: 'power3.out',
+        overwrite: 'auto',
+        onComplete: () => {
+          mask.dataset.placed = 'true';
+        },
+      });
+    };
+
+    const instant = mask.dataset.placed !== 'true';
+    if (instant) {
+      const delayed = gsap.delayedCall(0.62, () => place(0));
+      return () => {
+        delayed.kill();
+      };
+    }
+    place(0.45);
+  }, [menuOpen, previewId]);
+
+  useEffect(() => {
+    if (menuOpen) return;
+    const mask = maskRef.current;
+    if (!mask) return;
+    mask.dataset.placed = '';
+    gsap.set(mask, { autoAlpha: 0, width: 0, height: 0, x: 0, y: 0 });
+  }, [menuOpen]);
+
   useGSAP(
     () => {
       if (!menuOpen || !overlayRef.current) return;
@@ -119,13 +173,35 @@ export function Nav({
         <span style={{ transform: `scaleX(${progress})` }} />
       </div>
       <div className="container hud-bar">
-        <a href="#top" className="brand" data-testid="link-brand" data-cursor="hover" data-cursor-label="home" onClick={onClose}>
-          <span className="brand-mark">{profile.initials}</span>
-          <span>
-            {profile.name}
-            <span className="brand-dot">.</span>
-          </span>
-        </a>
+        <div className="hud-start">
+          <a
+            href="#top"
+            className="brand"
+            data-testid="link-brand"
+            data-cursor="hover"
+            data-cursor-label="home"
+            onClick={onClose}
+          >
+            <span className="brand-mark">{profile.initials}</span>
+            <span>
+              {profile.name}
+              <span className="brand-dot">.</span>
+            </span>
+          </a>
+          <button
+            className="inspect-btn mono"
+            type="button"
+            aria-label="Frame the current heading"
+            data-cursor="hover"
+            data-cursor-label="inspect"
+            onClick={(event) => {
+              event.preventDefault();
+              requestInspectFrame();
+            }}
+          >
+            inspect
+          </button>
+        </div>
         <div className="hud-end">
           <div className="status" hidden={menuOpen}>
             <span className="status-dot" />
@@ -168,8 +244,10 @@ export function Nav({
           <nav
             className="nav-overlay-list"
             aria-label="Primary navigation"
+            ref={listRef}
             onPointerLeave={() => setHoveredId(null)}
           >
+            <div className="nav-overlay-mask" ref={maskRef} aria-hidden="true" />
             {sections.map(({ id, label }, index) => (
               <Magnetic key={id} strength={0.08}>
                 <a
@@ -204,6 +282,7 @@ export function Nav({
               <br />
               {profile.location}
             </p>
+            <p className="mono nav-overlay-inspect">ALT+G inspect</p>
             <a href={`mailto:${profile.email}`} data-cursor="hover" data-cursor-label="mail">
               {profile.email}
             </a>
