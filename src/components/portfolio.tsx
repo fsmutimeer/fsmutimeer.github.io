@@ -14,6 +14,7 @@ import { About } from './about';
 import { Approach } from './approach';
 import { Contact } from './contact';
 import { Cursor } from './cursor';
+import { Experience } from './experience';
 import { Hero } from './hero';
 import { InspectGrid } from './inspect-grid';
 import { Nav } from './nav';
@@ -193,7 +194,7 @@ export function Portfolio() {
         stagger: 0.12,
         ease: 'power4.out',
       });
-      gsap.from('.hero-copy, .actions, .hero-hud, .scroll-cue, .eyebrow', {
+      gsap.from('.hero-copy, .hero-stack, .actions, .hero-hud, .scroll-cue, .eyebrow', {
         opacity: 0,
         y: 18,
         duration: 0.9,
@@ -214,7 +215,7 @@ export function Portfolio() {
         });
       });
 
-      gsap.utils.toArray<HTMLElement>('.section-intro, .about-focus-item, .stack-item, .principle, .technology-card, .lifecycle-step').forEach((node, index) => {
+      gsap.utils.toArray<HTMLElement>('.section-intro, .about-focus-item, .experience-item, .stack-item, .principle, .technology-card, .lifecycle-step').forEach((node, index) => {
         gsap.from(node, {
           opacity: 0,
           y: 28,
@@ -314,6 +315,7 @@ export function Portfolio() {
       <Nav menuOpen={menuOpen} onToggle={() => setMenuOpen((open) => !open)} onClose={closeMenu} />
       <Hero ready={ready || reducedMotion} />
       <About />
+      <Experience />
       <Work
         onOpenBrief={(project, origin) => {
           setBriefOrigin(origin);

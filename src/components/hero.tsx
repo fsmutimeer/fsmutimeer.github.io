@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { ArrowDownRight, FileText, Github } from 'lucide-react';
+import { FaLinkedinIn } from 'react-icons/fa';
 import { navItems } from '@/lib/content';
 import { profile } from '@/lib/profile';
 import { scrambleTo } from '@/lib/scramble';
@@ -21,25 +22,24 @@ export function Hero({ ready }: { ready: boolean }) {
   return (
     <section className="hero" id="top" aria-labelledby="hero-heading" data-ready={ready}>
       <div className="container hero-inner">
-        <p className="eyebrow mono">software engineer / IT22 B.V. · islamabad</p>
+        <p className="eyebrow mono">{profile.hero.eyebrow}</p>
         <h1 id="hero-heading">
           <span className="line-mask">
-            <span className="line">Code that</span>
+            <span className="line">{profile.hero.lines[0]}</span>
           </span>
           <span className="line-mask">
-            <span className="line">survives</span>
+            <span className="line">{profile.hero.lines[1]}</span>
           </span>
           <span className="line-mask">
             <span className="line">
-              <em>production.</em>
+              <em>{profile.hero.lines[2]}</em>
             </span>
           </span>
         </h1>
         <p className="hero-copy">
-          I’m <strong>{profile.name}</strong> — a software engineer at {profile.company} turning
-          Java services into systems that survive the cluster. From a Quarkus commit to a healthy
-          pod on OpenShift, I own the path in between.
+          I’m <strong>{profile.name}</strong> — {profile.hero.copy}
         </p>
+        <p className="hero-stack mono">{profile.hero.stack}</p>
         <div className="actions">
           <Magnetic>
             <a
@@ -54,12 +54,36 @@ export function Hero({ ready }: { ready: boolean }) {
           </Magnetic>
           <a
             className="text-link"
-            href="#contact"
-            data-testid="link-start-conversation"
+            href={profile.cvUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="link-cv-hero"
             data-cursor="hover"
-            data-cursor-label="talk"
+            data-cursor-label="cv"
           >
-            Start a conversation <ArrowUpRight size={14} aria-hidden="true" />
+            Download CV <FileText size={14} aria-hidden="true" />
+          </a>
+          <a
+            className="text-link"
+            href={profile.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="link-github-hero"
+            data-cursor="hover"
+            data-cursor-label="github"
+          >
+            GitHub <Github size={14} aria-hidden="true" />
+          </a>
+          <a
+            className="text-link"
+            href={profile.linkedinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="link-linkedin-hero"
+            data-cursor="hover"
+            data-cursor-label="linkedin"
+          >
+            LinkedIn <FaLinkedinIn size={13} aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -73,7 +97,7 @@ export function Hero({ ready }: { ready: boolean }) {
       </aside>
       <div className="scroll-cue mono">
         <span />
-        scroll the control plane
+        scroll
       </div>
     </section>
   );

@@ -12,9 +12,14 @@ export function About() {
             <div className="section-label mono">01 / about</div>
             <SplitTitle
               id="about-heading"
-              lines={['Engineer at the seam', 'of services and platforms.']}
+              lines={['Software engineer.', 'Backend and platform.']}
             />
-            <p className="section-intro">{profile.about.summary}</p>
+            {profile.about.summary.map((paragraph) => (
+              <p className="section-intro" key={paragraph.slice(0, 48)}>
+                {paragraph}
+              </p>
+            ))}
+            <p className="section-intro about-previous">{profile.about.previous}</p>
             <p className="section-intro about-education mono">{profile.about.education}</p>
             <div className="about-stack" aria-label="Core technologies">
               {profile.about.stack.map((item) => (

@@ -8,6 +8,7 @@ const STORAGE_KEY = 'inspect-grid';
 const headings = [
   '#hero-heading',
   '#about-heading',
+  '#experience-heading',
   '#work-heading',
   '#approach-heading',
   '#platform-heading',

@@ -10,7 +10,7 @@ import { scrambleTo } from '@/lib/scramble';
 import { requestInspectFrame } from './inspect-grid';
 
 const sections = [
-  { id: 'top', label: 'Home', preview: 'Code that survives production.' },
+  { id: 'top', label: 'Home', preview: 'Software engineer at IT22. Backend and platform work.' },
   ...navItems,
 ] as const;
 
@@ -208,7 +208,7 @@ export function Nav({
             <span>
               {String(activeIndex).padStart(2, '0')} / {String(sections.length).padStart(2, '0')}
             </span>
-            <span className="status-copy">shipping at {profile.company}</span>
+            <span className="status-copy">at {profile.company}</span>
           </div>
           <button
             className="index-btn"
@@ -276,7 +276,7 @@ export function Nav({
               <p className="nav-overlay-preview-label">{previewItem.label}</p>
               <p>{previewItem.preview}</p>
             </div>
-            <p className="mono nav-overlay-kicker">signal</p>
+            <p className="mono nav-overlay-kicker">employed</p>
             <p>
               Software engineer at {profile.company}
               <br />

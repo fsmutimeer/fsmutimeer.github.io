@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronRight, X, ArrowUpRight } from 'lucide-react';
 import gsap from 'gsap';
 import { projects, type Project } from '@/lib/content';
+import { withBasePath } from '@/lib/base-path';
 import { sceneState } from '@/lib/scene-state';
 import { Magnetic } from './magnetic';
 import { SplitTitle } from './split-title';
@@ -26,12 +27,12 @@ export function Work({
       <div className="work-pin">
         <div className="container work-head">
           <div>
-            <div className="section-label mono">02 / selected systems</div>
-            <SplitTitle id="work-heading" lines={['The work behind', 'the cluster.']} />
+            <div className="section-label mono">03 / selected work</div>
+            <SplitTitle id="work-heading" lines={['Four pieces', 'of work.']} />
           </div>
           <p className="section-intro">
-            Selected systems from IT22—the services, the on-prem cluster, the GitOps path—and
-            quarkus-doctor, the Maven plugin I built to catch Quarkus config bugs before deploy.
+            Cards 01–03 are parts of the same IT22 job. Card 04 is a public tool I wrote. IT22 pages
+            omit customer names and unpublished numbers.
           </p>
         </div>
         <div className="work-track">
@@ -51,6 +52,7 @@ export function Work({
                   active={hovered === index || (hovered === null && pinnedIndex === index)}
                 />
                 <div className="work-panel-no mono">{project.number}</div>
+                <div className="project-sub mono">{project.scope}</div>
                 <div className="project-sub mono">{project.subtitle}</div>
                 <h3>{project.title}</h3>
                 <p data-testid={`text-project-copy-${project.number}`}>{project.copy}</p>
@@ -69,6 +71,15 @@ export function Work({
                   ))}
                 </div>
                 <div className="work-panel-actions">
+                  <a
+                    className="text-link"
+                    href={withBasePath(`/work/${project.slug}/`)}
+                    data-testid={`link-case-study-${project.number}`}
+                    data-cursor="hover"
+                    data-cursor-label="open"
+                  >
+                    Read the case study <ArrowUpRight size={12} aria-hidden="true" />
+                  </a>
                   <button
                     className="text-link brief-button"
                     type="button"
@@ -240,11 +251,12 @@ export function BriefDialog({
           </button>
         </div>
         <div className="dialog-body">
+          <div className="project-sub mono">{project.scope}</div>
           <div className="project-sub mono">{project.subtitle}</div>
           <p>{project.detail}</p>
           <div className="detail-grid">
             <div className="detail-box">
-              <strong>Signal</strong>
+              <strong>What this is</strong>
               <span>{project.metrics.join(' · ')}</span>
             </div>
             <div className="detail-box">
@@ -261,6 +273,16 @@ export function BriefDialog({
             </div>
           </div>
           <div className="dialog-footer">
+            <a
+              className="text-link"
+              href={withBasePath(`/work/${project.slug}/`)}
+              data-testid="link-brief-case-study"
+              data-cursor="hover"
+              data-cursor-label="open"
+              onClick={dismiss}
+            >
+              Read the full case study <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
             {project.href && (
               <a
                 className="text-link"
@@ -295,7 +317,7 @@ export function BriefDialog({
               data-cursor-label="talk"
               onClick={dismiss}
             >
-              Talk through a similar problem <ArrowUpRight size={14} aria-hidden="true" />
+              Contact <ArrowUpRight size={14} aria-hidden="true" />
             </a>
           </div>
         </div>

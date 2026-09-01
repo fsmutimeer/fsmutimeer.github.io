@@ -4,7 +4,7 @@ export const profile = {
   name: 'Feroz Shah',
   initials: 'FS',
   handle: 'fsmutimeer',
-  role: 'software engineer',
+  role: 'Software engineer · backend & platform',
   company: 'IT22 B.V.',
   companyUrl: 'https://it22.nl/',
   location: 'Islamabad, Pakistan',
@@ -17,31 +17,43 @@ export const profile = {
   timezone: 'PKT · UTC+5',
   githubUrl: 'https://github.com/fsmutimeer',
   linkedinUrl: 'https://www.linkedin.com/in/fsmutimeer/',
+  hero: {
+    eyebrow: 'software engineer · backend & platform · IT22 B.V. · islamabad',
+    lines: ['Software engineer', 'backend and platform', 'IT22 B.V.'] as const,
+    copy:
+      'a software engineer at IT22 B.V. in Islamabad. The job title is software engineer. The work is Java/Quarkus services and the OpenShift/OKD clusters they run on, with Kafka, GitOps, and Tekton.',
+    stack: 'Java · Quarkus · Kafka · Kubernetes · OpenShift · GitOps',
+  },
   about: {
-    headline: 'Engineer at the seam of services and platforms.',
-    summary:
-      'Software engineer at IT22 B.V. in Islamabad. I lead backend work on Quarkus microservices—Apache Camel, Kafka, MongoDB, Keycloak—and I stand up the OpenShift / OKD clusters those services run on, with Tekton, Argo CD, and Helm taking them to production. Before that I shipped Node.js backends at ESOLS Technologies.',
+    headline: 'Software engineer. Backend and platform.',
+    summary: [
+      'I am a software engineer at IT22 B.V. in Islamabad. That is my current employer and job title.',
+      'The work covers two areas in the same role: backend services (Java, Quarkus, Apache Camel, Kafka, MongoDB, Keycloak) and the platforms those services run on (OpenShift, OKD, Kubernetes, Tekton, Argo CD, Helm, Trivy, Wazuh).',
+      'I care about services that are straightforward to operate and a delivery path that does not need a special ritual for each release.',
+    ],
+    previous:
+      'Before IT22 I was a software engineer at ESOLS Technologies (Aug 2021 – Jan 2023), writing Node.js backends. That is previous employment, not my current stack.',
     education: 'M.Sc Information Technology · Quaid-i-Azam University · 2017–2019',
     focus: [
       {
         title: 'Java · Quarkus · Apache Camel',
-        copy: 'Backend services, integration flows, and contracts that stay small enough to reason about in production.',
+        copy: 'I write the backend services and integration flows at IT22.',
       },
       {
         title: 'Kafka · MongoDB',
-        copy: 'Event-driven paths between services, plus aggregation pipelines that keep retrieval fast as the data grows.',
+        copy: 'Services talk over Kafka. Data and retrieval sit in MongoDB, including aggregation pipelines.',
       },
       {
         title: 'OpenShift · OKD · Kubernetes',
-        copy: 'On-prem clusters on KVM—control plane, workers, and the guardrails that make the happy path the default path.',
+        copy: 'I deployed an OpenShift cluster and an OKD cluster on-prem on KVM. Each has three control-plane nodes and one worker.',
       },
       {
         title: 'GitOps · Argo CD · Tekton',
-        copy: 'App-of-Apps, Helm, webhooks, and pipelines that promote a known commit without heroics.',
+        copy: 'A Git commit is built in Tekton, scanned, and synced to OpenShift with Argo CD and Helm.',
       },
       {
         title: 'Keycloak · Wazuh · Trivy',
-        copy: 'Identity, cluster security monitoring, and image scanning in the delivery path—before a CVE becomes a deploy.',
+        copy: 'Keycloak for RBAC. Trivy scans images in CI. Wazuh monitors the cluster.',
       },
     ],
     stack: [
@@ -60,7 +72,6 @@ export const profile = {
       'Wazuh',
       'Trivy',
       'Docker',
-      'Node.js',
     ],
   },
 } as const;

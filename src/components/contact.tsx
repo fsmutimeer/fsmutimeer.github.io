@@ -31,15 +31,14 @@ export function Contact() {
     <section className="section now" id="now" aria-labelledby="now-heading">
       <div className="container now-grid">
         <div>
-          <div className="section-label mono">05 / current signal</div>
+          <div className="section-label mono">06 / contact</div>
           <SplitTitle
             id="now-heading"
-            lines={['Currently shipping at', profile.company]}
+            lines={['I work at', profile.company]}
           />
           <p className="section-intro">
-            Backend and platform work in {profile.location} — Quarkus services, OpenShift clusters, and
-            the GitOps path between them. If you have a hard service or cluster problem, tell me
-            what’s breaking.
+            Employed at {profile.company} in {profile.location}. Email, phone, CV, GitHub, and
+            LinkedIn are here. This page does not say I am looking for a job.
           </p>
           <div className="availability" data-testid="status-availability">
             <i /> {profile.company} · {profile.location}
@@ -48,7 +47,7 @@ export function Contact() {
         <div className="contact" id="contact">
           <div>
             <div className="mono section-label" style={{ marginBottom: 12 }}>
-              route open
+              email
             </div>
             <Magnetic strength={0.12}>
               <a
@@ -68,8 +67,7 @@ export function Contact() {
             </Magnetic>
           </div>
           <p className="contact-note">
-            Have a hard service or cluster problem, or a team building its first one? Tell me what’s
-            breaking.{' '}
+            Email, CV, GitHub, and LinkedIn are also in the footer.{' '}
             <a
               href={profile.cvUrl}
               target="_blank"

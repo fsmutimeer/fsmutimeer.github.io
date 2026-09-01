@@ -19,11 +19,11 @@ export function Approach({
       <div className="container">
         <div className="split">
           <div>
-            <div className="section-label mono">03 / the capability story</div>
-            <SplitTitle id="approach-heading" lines={['The path, not', 'the logo wall.']} />
+            <div className="section-label mono">04 / delivery path</div>
+            <SplitTitle id="approach-heading" lines={['How a change', 'gets to OpenShift.']} />
             <p className="section-intro">
-              Work is what shipped. This is how it moves: a service boundary, a Git commit, a
-              scanned image, a pod the cluster will admit.
+              This is the IT22 delivery path, not another employer. The tools below are the ones on
+              the CV.
             </p>
           </div>
           <div className="stack-list" data-testid="list-capabilities">
@@ -59,15 +59,15 @@ export function Approach({
         <div className="platform-spine" id="platform" aria-labelledby="platform-heading">
           <div className="platform-spine-head">
             <div>
-              <div className="section-label mono">04 / platform spine</div>
+              <div className="section-label mono">05 / tools on that path</div>
               <SplitTitle
                 id="platform-heading"
-                lines={['From commit to a', 'signal you can trust.']}
+                lines={['Quarkus, OpenShift,', 'Kubernetes, Kafka.']}
               />
             </div>
             <p className="section-intro">
-              The tools matter. The handoffs between them matter more. Pick a piece, then walk the
-              life cycle.
+              Four technologies from the IT22 work. Pick one, then the stages below. This is still
+              the same job.
             </p>
           </div>
           <div className="technology-explorer">
@@ -109,7 +109,7 @@ export function Approach({
             <div className="lifecycle-heading">
               <div className="section-label mono">software life cycle</div>
               <span className="mono lifecycle-status">
-                <span /> pipeline healthy
+                <span /> IT22 path
               </span>
             </div>
             <div className="lifecycle-steps" role="tablist" aria-label="Software lifecycle stages">

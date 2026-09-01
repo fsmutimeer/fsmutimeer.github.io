@@ -7,13 +7,13 @@ import './globals.css';
 export const metadata: Metadata = {
   title: `${profile.name} — Software Engineer`,
   description:
-    `${profile.name} is a software engineer at IT22 B.V. in Islamabad, building Quarkus microservices and OpenShift / OKD platforms with Kafka, Tekton, and Argo CD.`,
+    `${profile.name} is a software engineer at IT22 B.V. in Islamabad. The work is Java/Quarkus backend services and OpenShift/OKD platforms (Kafka, GitOps, Tekton).`,
   robots: { index: true, follow: true },
   alternates: { canonical: '/' },
   openGraph: {
     title: `${profile.name} — Software Engineer`,
     description:
-      'Code that survives production. Java, Quarkus, OpenShift, OKD, Kafka, GitOps, and Tekton.',
+      'Software engineer at IT22 B.V. Java, Quarkus, Kafka, OpenShift, OKD, GitOps. Islamabad.',
     type: 'website',
     url: '/',
     siteName: profile.name,
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${profile.name} — Software Engineer`,
     description:
-      'Code that survives production. Java, Quarkus, OpenShift, OKD, Kafka, GitOps, and Tekton.',
+      'Software engineer at IT22 B.V. Java, Quarkus, Kafka, OpenShift, OKD, GitOps. Islamabad.',
   },
   icons: { icon: withBasePath('/favicon.svg') },
 };
@@ -43,7 +43,7 @@ const jsonLd = {
     addressCountry: 'PK',
   },
   description:
-    'Software engineer building Quarkus microservices and OpenShift platforms at IT22 B.V.',
+    'Software engineer at IT22 B.V. working on Quarkus microservices and OpenShift / OKD platforms.',
   email: `mailto:${profile.email}`,
   telephone: profile.phoneHref.replace('tel:', ''),
   url: 'https://fsmutimeer.github.io/',
