@@ -1487,3 +1487,109 @@ footer {
   .study-title { max-width: none; }
   .study-bar-inner { height: 66px; }
 }
+
+.story-section {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.9fr) minmax(280px, 1.1fr);
+  gap: 48px;
+  align-items: start;
+  margin-top: 72px;
+  padding-top: 36px;
+  border-top: 1px solid var(--line);
+}
+.story-section[data-align='image-right'] {
+  grid-template-columns: minmax(280px, 1.1fr) minmax(240px, 0.9fr);
+}
+.story-section[data-align='image-right'] .story-figure {
+  order: 2;
+}
+.story-figure {
+  margin: 0;
+  position: sticky;
+  top: 96px;
+}
+.story-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  background: rgb(8 18 15 / 55%);
+}
+.story-photo-slot {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  min-height: 320px;
+  aspect-ratio: 4 / 5;
+  border: 1px dashed rgb(200 243 106 / 28%);
+  background:
+    linear-gradient(145deg, rgb(200 243 106 / 6%), rgb(8 18 15 / 55%)),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 12px,
+      rgb(200 243 106 / 4%) 12px,
+      rgb(200 243 106 / 4%) 13px
+    );
+}
+.story-photo-mark {
+  color: var(--acid);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.story-photo-hint {
+  color: #6f8b82;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.story-figure figcaption {
+  margin-top: 12px;
+  color: #6f8b82;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.story-copy h2 {
+  margin: 8px 0 18px;
+  font-family: var(--app-font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+}
+.story-no {
+  color: var(--acid);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+}
+.story-copy p {
+  max-width: 58ch;
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.story-signoff {
+  margin: 64px 0 0;
+  font-family: var(--app-font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+@media (max-width: 760px) {
+  .story-section,
+  .story-section[data-align='image-right'] {
+    display: block;
+  }
+  .story-figure {
+    position: static;
+    margin-bottom: 28px;
+  }
+  .story-section[data-align='image-right'] .story-figure {
+    order: 0;
+  }
+  .story-photo,
+  .story-photo-slot {
+    min-height: 240px;
+    aspect-ratio: 16 / 10;
+  }
+}

@@ -5,6 +5,7 @@ import { ArrowDownRight, FileText, Github } from 'lucide-react';
 import { FaLinkedinIn } from 'react-icons/fa';
 import { navItems } from '@/lib/content';
 import { profile } from '@/lib/profile';
+import { withBasePath } from '@/lib/base-path';
 import { scrambleTo } from '@/lib/scramble';
 import { Magnetic } from './magnetic';
 
@@ -52,6 +53,15 @@ export function Hero({ ready }: { ready: boolean }) {
               See selected work <ArrowDownRight size={16} aria-hidden="true" />
             </a>
           </Magnetic>
+          <a
+            className="text-link"
+            href={withBasePath('/about/')}
+            data-testid="link-about-hero"
+            data-cursor="hover"
+            data-cursor-label="story"
+          >
+            About me
+          </a>
           <a
             className="text-link"
             href={profile.cvUrl}

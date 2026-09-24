@@ -28,6 +28,7 @@ export function CaseStudy({ project }: { project: Project }) {
             </span>
           </a>
           <nav className="study-bar-links" aria-label="Case study">
+            <a href={withBasePath('/about/')}>About me</a>
             <a href={homeWork}>Selected work</a>
             <a href={profile.cvUrl} target="_blank" rel="noopener noreferrer">
               CV

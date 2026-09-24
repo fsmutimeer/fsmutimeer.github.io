@@ -1,6 +1,7 @@
 'use client';
 
 import { profile } from '@/lib/profile';
+import { withBasePath } from '@/lib/base-path';
 import { SplitTitle } from './split-title';
 
 export function About() {
@@ -21,6 +22,17 @@ export function About() {
             ))}
             <p className="section-intro about-previous">{profile.about.previous}</p>
             <p className="section-intro about-education mono">{profile.about.education}</p>
+            <p className="section-intro">
+              <a
+                className="text-link"
+                href={withBasePath('/about/')}
+                data-testid="link-about-story"
+                data-cursor="hover"
+                data-cursor-label="story"
+              >
+                The longer story
+              </a>
+            </p>
             <div className="about-stack" aria-label="Core technologies">
               {profile.about.stack.map((item) => (
                 <span

@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { navItems } from '@/lib/content';
 import { profile } from '@/lib/profile';
+import { withBasePath } from '@/lib/base-path';
 import { Magnetic } from './magnetic';
 import { scrambleTo } from '@/lib/scramble';
 import { requestInspectFrame } from './inspect-grid';
@@ -283,6 +284,9 @@ export function Nav({
               {profile.location}
             </p>
             <p className="mono nav-overlay-inspect">ALT+G inspect</p>
+            <a href={withBasePath('/about/')} data-cursor="hover" data-cursor-label="story">
+              About me
+            </a>
             <a href={`mailto:${profile.email}`} data-cursor="hover" data-cursor-label="mail">
               {profile.email}
             </a>

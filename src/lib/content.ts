@@ -419,7 +419,12 @@ export const principles: { title: string; copy: string; Icon: LucideIcon }[] = [
 ];
 
 export const navItems = [
-  { id: 'about', label: 'About', preview: 'Software engineer at IT22. Backend and platform work.' },
+  {
+    id: 'about',
+    label: 'About',
+    preview: 'Kalash, photography, IT, and the mountains still called home.',
+    href: '/about/',
+  },
   { id: 'experience', label: 'Experience', preview: 'IT22 from Jan 2023. ESOLS Aug 2021–Jan 2023.' },
   { id: 'work', label: 'Work', preview: 'Three views of the IT22 job, plus quarkus-doctor.' },
   { id: 'approach', label: 'Approach', preview: 'The IT22 path from Git to OpenShift. Not another job.' },
