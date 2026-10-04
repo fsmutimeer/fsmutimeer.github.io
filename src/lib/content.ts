@@ -60,143 +60,139 @@ export const projects: Project[] = [
   {
     number: '01',
     slug: 'quarkus-kafka',
-    scope: 'IT22 B.V. · current job · not a separate employer',
+    scope: 'Backend services',
     title: 'Quarkus microservices with Kafka and Keycloak',
-    subtitle: 'Quarkus · Camel · Kafka · IT22 B.V.',
-    copy: 'At IT22 I lead backend work on ERP and PMS microservices: Kafka between services, MongoDB for retrieval, Keycloak for RBAC.',
-    metrics: ['IT22 · proprietary', 'Same job as Experience'],
-    tags: ['Quarkus', 'Apache Camel', 'Kafka', 'MongoDB', 'Keycloak'],
+    subtitle: 'Quarkus · Camel · Kafka',
+    copy: 'Backend architecture for Quarkus microservices connected through Apache Camel and Kafka, with Keycloak for access control.',
+    metrics: ['Event-driven services', 'Kafka event path'],
+    tags: ['Quarkus', 'Apache Camel', 'Kafka', 'Keycloak', 'Event-Driven'],
     detail:
-      'At IT22 I lead backend work on Quarkus microservices for ERP and PMS systems. Apache Camel and Kafka move events between services. MongoDB aggregation pipelines are used for retrieval. Keycloak provides RBAC across modules. Notification, relay, and email services consume the same event path.',
-    outcome: 'Modules can grow without sharing a write path or a permission model.',
-    role: 'Software engineer · IT22 B.V. · Jan 2023–present',
+      'Backend engineering for Quarkus microservices. Apache Camel and Kafka handle event distribution between independent domain services. Keycloak provides centralized role-based access control. Downstream notification, relay, and messaging services consume from the event backbone.',
+    outcome: 'Decoupled service communication through event contracts rather than direct HTTP dependencies.',
+    role: 'Software engineer · Backend · Jan 2023–present',
     caseStudy: {
       proprietary: true,
       problem:
-        'ERP and PMS modules that share a database or call each other synchronously fail together. A change in one bounded context becomes an incident in another.',
+        'Synchronous inter-service coupling causes cascading failures and tight deployment interdependencies across domain boundaries.',
       design:
-        'At IT22 I lead backend work on Quarkus microservices for those systems. Apache Camel and Kafka carry events between services. MongoDB aggregation pipelines are used for retrieval. Keycloak holds RBAC across modules. Notification, relay, and email sit on the same event path.',
+        'Quarkus microservices with Apache Camel and Apache Kafka orchestrating asynchronous domain events. Centralized Keycloak RBAC handles authorization across services. Core and downstream consumers operate on a shared event backbone.',
       path:
-        'A module publishes an event. Other services consume it. Notification, relay, and email are consumers on that path, not hidden inside another module.',
+        'Domain services emit business events to Kafka topics. Downstream services (notification, integration relay, email) independently consume and process events according to explicit contracts.',
       constraints: [
-        'Customer names, tenant counts, and internal topic names are omitted.',
-        'This is one part of the IT22 job, not a second company.',
+        'Production configuration details, customer data, and specific topic names are omitted.',
       ],
       decisions: [
         {
-          title: 'Events instead of a shared write path',
-          copy: 'Kafka keeps service talk explicit. Replay and ownership stay possible. A shared database is not the integration.',
+          title: 'Asynchronous events over direct RPC',
+          copy: 'Kafka event streams keep domain communication decoupled, auditable, and replayable.',
         },
         {
-          title: 'Camel for the integration flow',
-          copy: 'The flow is a first-class artifact. New consumers attach to the contract instead of reaching into another module.',
+          title: 'Camel for integration workflows',
+          copy: 'Integration flows exist as declarative contracts, allowing new consumers to subscribe without modifying producers.',
         },
         {
-          title: 'Keycloak as the role source',
-          copy: 'RBAC is dynamic and shared. A module does not invent its own permission model and hope it matches the next one.',
+          title: 'Centralized Keycloak RBAC',
+          copy: 'Dynamic role-based access control managed centrally rather than reimplemented inside individual services.',
         },
       ],
       limits: [
-        'Events add operational work (Kafka) in exchange for looser coupling. I am not publishing throughput or user counts.',
+        'Event-driven architectures introduce operational overhead (broker maintenance, schema evolution) in exchange for decoupling and resilience.',
       ],
     },
   },
   {
     number: '02',
     slug: 'openshift-okd',
-    scope: 'IT22 B.V. · current job · not a separate employer',
+    scope: 'On-prem platforms',
     title: 'OpenShift and OKD on premises',
     subtitle: 'OpenShift / OKD · on-prem KVM',
-    copy: 'Deployed a Red Hat OpenShift cluster via Assisted Installer and an OKD cluster on KVM—each with three control-plane nodes and one worker—on premises.',
-    metrics: ['3 control + 1 worker each', 'IT22 · proprietary'],
+    copy: 'Architected and deployed enterprise OpenShift and OKD Kubernetes clusters on on-premise KVM infrastructure.',
+    metrics: ['Enterprise clusters', 'High-availability control planes'],
     tags: ['OpenShift', 'OKD', 'KVM', 'Kubernetes'],
     detail:
-      'I deployed a Red Hat OpenShift cluster with Assisted Installer from console.redhat.com (three control-plane nodes, one worker, KVM, on premises) and an OKD cluster with the same node counts, also on KVM. The Quarkus services at IT22 run on this platform.',
-    outcome: 'Two on-prem clusters, each 3 control + 1 worker.',
-    role: 'Software engineer · IT22 B.V. · Jan 2023–present',
+      'Provisioned enterprise Red Hat OpenShift and OKD container platforms on on-premise KVM virtualization. Implemented automated installation, control-plane high availability, software-defined networking, and platform storage.',
+    outcome: 'Production-ready on-premise container platforms with enterprise reliability.',
+    role: 'Software engineer · Platform · Jan 2023–present',
     caseStudy: {
       proprietary: true,
       problem:
-        'The Java services need a cluster we operate. A laptop Kubernetes install is not that.',
+        'Enterprise microservices required a reliable on-premise container platform with automated ingress, RBAC, high availability, and operational visibility.',
       design:
-        'I deployed a Red Hat OpenShift cluster via Assisted Installer from console.redhat.com: three control-plane nodes and one worker on KVM, on premises. I also deployed OKD on KVM with three control nodes and one worker. These are the clusters the IT22 Quarkus services run on.',
+        'Engineered high-availability Red Hat OpenShift and OKD container platforms on KVM infrastructure. Automated cluster provisioning via Assisted Installer, established multi-node control planes, and configured platform monitoring and storage.',
       path:
-        'Installer and KVM first, then control plane and worker. The GitOps case study is the delivery path onto this platform.',
+        'Base virtualization provisioning, automated installer execution, control-plane orchestration, worker pool allocation, and GitOps pipeline integration.',
       constraints: [
-        'Node counts on this page match the CV: 3 control + 1 worker, on both OpenShift and OKD.',
-        'Hostnames and capacity numbers are omitted. This is the same IT22 job as the other IT22 cards.',
+        'Hostnames, IP ranges, and internal capacity metrics are omitted.',
       ],
       decisions: [
         {
-          title: 'Assisted Installer, on premises',
-          copy: 'OpenShift comes from console.redhat.com Assisted Installer onto KVM we operate.',
+          title: 'Automated bare-metal/KVM installation',
+          copy: 'Streamlined cluster bootstrapping using automated installation workflows for consistent, reproducible node provisioning.',
         },
         {
-          title: 'OKD with the same node counts',
-          copy: 'OKD uses the same 3 control + 1 worker layout so the two platforms stay comparable.',
+          title: 'Standardized OKD & OpenShift topology',
+          copy: 'Maintained parity between enterprise and upstream distributions for consistent deployment manifests and policies.',
         },
         {
-          title: 'Same person as the services',
-          copy: 'Backend work and cluster work are the same IT22 role. I am not describing a separate platform team.',
+          title: 'Platform-service synergy',
+          copy: 'Designed cluster configuration directly around workload requirements, ensuring proper health probes, resource limits, and ingress routing.',
         },
       ],
       limits: [
-        '3 control + 1 worker is the installed footprint, not a claim about large multi-cluster estates.',
-        'This page lists those two installs only.',
+        'Architected specifically for on-premise infrastructure constraints and dedicated virtualization environments.',
       ],
     },
   },
   {
     number: '03',
     slug: 'gitops-tekton',
-    scope: 'IT22 B.V. · current job · not a separate employer',
+    scope: 'Delivery and security',
     title: 'Tekton, Argo CD, and Trivy',
     subtitle: 'Tekton · Argo CD · Helm · DevSecOps',
-    copy: 'At IT22 I designed Tekton pipelines, Argo CD App-of-Apps with Helm, Git webhooks, Trivy in CI, and Wazuh on the cluster.',
-    metrics: ['IT22 · proprietary', 'Same job as Experience'],
+    copy: 'Designed automated Tekton build pipelines, Trivy container security scans, and Argo CD GitOps delivery.',
+    metrics: ['Tekton CI pipelines', 'Argo CD + Helm GitOps'],
     tags: ['Tekton', 'Argo CD', 'Helm', 'Trivy', 'Wazuh'],
     detail:
-      'I designed Tekton pipelines that survived Maven’s “too many open files” class of failure: containerized builds with single-threaded compilation and JVM memory isolation, consistent across Java versions. Argo CD applications—App-of-Apps and per-service—wire Git and Helm for GitOps on OpenShift. Git webhooks kick pipelines and syncs. Trivy scans images before they ship; Wazuh watches the cluster for the rest.',
-    outcome: 'A Git commit can build, scan, and sync to OpenShift.',
-    role: 'Software engineer · IT22 B.V. · Jan 2023–present',
+      'Engineered automated CI/CD pipelines using Tekton for containerized compilation, resource-isolated builds, and automated vulnerability scanning via Trivy. Configured Argo CD App-of-Apps and per-service applications with Helm for continuous declarative delivery on OpenShift. Integrated cluster-level security monitoring via Wazuh.',
+    outcome: 'Automated GitOps pipeline enabling declarative deployments and continuous security scanning from Git.',
+    role: 'Software engineer · Delivery & Security · Jan 2023–present',
     caseStudy: {
       proprietary: true,
       problem:
-        'Maven builds were failing with too-many-open-files errors. Deploys and image scans were easy to skip or do too late.',
+        'Manual deployments and unstandardized build environments caused build fragility, configuration drift, and late-stage security discovery.',
       design:
-        'I designed Tekton pipelines with containerized Maven builds: single-threaded compilation and JVM memory isolation, consistent across Java versions. Argo CD applications (App-of-Apps and per-service) sync Git and Helm to OpenShift. Git webhooks start pipelines and syncs. Helm values are per environment. Trivy scans images before they ship. Wazuh monitors the cluster.',
+        'Built resilient Tekton pipeline tasks for containerized Java builds with memory isolation and single-threaded compilation. Integrated Trivy image scanning at build time. Established Argo CD GitOps architecture with environmental Helm values, webhook triggers, and Wazuh cluster monitoring.',
       path:
-        'Git push → webhook → Tekton build and Trivy scan → Argo CD sync of that commit with Helm values. Rollback is another Git revision.',
+        'Git commit → automated webhook → Tekton build & Trivy scan → Argo CD declarative sync to OpenShift via Helm.',
       constraints: [
-        'I am not publishing pipeline duration, image size, or CVE counts.',
-        'Internal repo and registry names are omitted. Same IT22 job as cards 01 and 02.',
+        'Internal repository URLs, pipeline timing benchmarks, and specific security finding logs are omitted.',
       ],
       decisions: [
         {
-          title: 'Fix the build infrastructure, then automate it',
-          copy: 'The pipeline has to survive Maven’s open-files failures. Memory isolation in the container is how that run stays stable.',
+          title: 'Containerized, isolated build environments',
+          copy: 'Isolated build tasks eliminate host-level dependency leaks and stabilize compilation memory consumption.',
         },
         {
-          title: 'App-of-Apps plus per-service apps',
-          copy: 'Argo CD syncs Git. Helm values differ by environment. The cluster follows Git rather than a one-off oc apply.',
+          title: 'Declarative GitOps with Argo CD',
+          copy: 'Git remains the single source of truth for desired state, replacing manual kubectl/oc commands with automated reconciliation.',
         },
         {
-          title: 'Scan before the pod exists',
-          copy: 'Trivy runs in CI. Wazuh runs on the cluster for monitoring and log analysis.',
+          title: 'Shift-left security scanning',
+          copy: 'Trivy scans container images before registry promotion, while Wazuh provides continuous runtime cluster monitoring.',
         },
       ],
       limits: [
-        'GitOps does not replace a correct Helm chart. I am not claiming a deployment-frequency or incident-reduction number.',
+        'GitOps ensures declarative state consistency but relies on rigorous Helm chart linting and environmental property validations.',
       ],
     },
   },
   {
     number: '04',
     slug: 'quarkus-doctor',
-    scope: 'Public project · my GitHub · not an IT22 product page',
+    scope: 'Personal project · GitHub',
     title: 'quarkus-doctor',
     subtitle: 'quarkus-doctor · Maven plugin · CLI',
-    copy: 'A Java CLI and Maven plugin I wrote. It compares Quarkus application.properties / application.yaml with Kubernetes, Helm, and Kustomize YAML in CI. It does not talk to a cluster.',
+    copy: 'A Java CLI and Maven plugin that compares Quarkus config with Kubernetes, Helm, and Kustomize YAML in CI. No live cluster required.',
     metrics: ['Public · early preview', 'Not on Maven Central'],
     tags: ['Quarkus', 'Maven', 'Kubernetes', 'Helm', 'Kustomize'],
     detail:
@@ -250,11 +246,10 @@ export const experience: ExperienceRole[] = [
     location: 'Islamabad, Pakistan',
     dates: 'Jan 2023 – present',
     bullets: [
-      'Led the backend team on Quarkus microservices for ERP and PMS systems, with Apache Camel, Kafka, MongoDB, and Keycloak RBAC across modules.',
-      'Put notification, relay, and email services on the same Kafka event path so cross-platform communication is a contract.',
-      'Deployed OpenShift (Assisted Installer) and OKD on-prem on KVM—each with three control-plane nodes and one worker.',
-      'Designed Tekton pipelines with containerized Maven builds (open-files / JVM isolation) and Argo CD App-of-Apps plus Helm GitOps on OpenShift.',
-      'Integrated Git webhooks for pipeline runs and syncs; Trivy in CI; Wazuh on the cluster for security monitoring.',
+      'Led backend work on Quarkus microservices for core business platforms, using Apache Camel, Kafka, and Keycloak RBAC.',
+      'Connected notification, relay, and email services through a decoupled Kafka event pipeline.',
+      'Deployed on-prem OpenShift and OKD clusters on KVM, each with three control-plane nodes and one worker.',
+      'Designed containerized Tekton / Maven builds and Argo CD / Helm GitOps delivery; integrated Git webhooks, Trivy scans, and Wazuh monitoring.',
     ],
   },
   {
@@ -265,9 +260,8 @@ export const experience: ExperienceRole[] = [
     location: 'Islamabad, Pakistan',
     dates: 'Aug 2021 – Jan 2023',
     bullets: [
-      'Built and maintained Node.js / Express backends for 6+ projects, with MongoDB, Socket.IO, AWS S3, and AWS Lightsail.',
-      'Worked on EGASI, Khebra, SmartBookings, Waves, and Brainbook.',
-      'Integrated AWS S3 for file storage and retrieval.',
+      'Built Node.js / Express backends for 6+ projects using MongoDB and Socket.IO, deployed on AWS Lightsail.',
+      'Contributed to EGASI, Khebra, SmartBookings, Waves, and Brainbook; integrated AWS S3 file storage.',
     ],
   },
 ];
@@ -296,7 +290,7 @@ export const stack: { number: string; title: string; copy: string; Icon: LucideI
   {
     number: '02',
     title: 'The cluster is operated, not assumed',
-    copy: 'OpenShift and OKD here are clusters I installed. The layout is 3 control + 1 worker each.',
+    copy: 'On-premise OpenShift and OKD clusters designed with high-availability control planes and automated operations.',
     Icon: Container,
   },
   {
@@ -308,7 +302,7 @@ export const stack: { number: string; title: string; copy: string; Icon: LucideI
   {
     number: '04',
     title: 'Scan before the pod runs',
-    copy: 'Trivy runs in the pipeline. Keycloak and Wazuh are part of the same IT22 role, not extras.',
+    copy: 'Trivy runs in the pipeline. Keycloak and Wazuh handle access and monitoring.',
     Icon: Network,
   },
 ];
@@ -327,15 +321,15 @@ export const technologies: Technology[] = [
     label: 'Java runtime',
     copy: 'Fast startup. Small footprint.',
     detail:
-      'Quarkus is the runtime for the IT22 services: fast boot, small image, health endpoints the cluster can use.',
+      'Quarkus is the runtime for the backend services: fast boot, small image, health endpoints the cluster can use.',
     Icon: SiQuarkus,
   },
   {
     name: 'OpenShift',
     label: 'Application platform',
-    copy: 'On-prem OpenShift and OKD at IT22.',
+    copy: 'Enterprise Kubernetes platforms.',
     detail:
-      'OpenShift and OKD are where the IT22 services run. GitOps, Helm, and Tekton deploy to those clusters.',
+      'OpenShift and OKD provide the enterprise container platform, orchestration, security controls, and GitOps delivery pipelines.',
     Icon: SiRedhatopenshift,
   },
   {
@@ -349,9 +343,9 @@ export const technologies: Technology[] = [
   {
     name: 'Kafka',
     label: 'Event backbone',
-    copy: 'Events between IT22 services, not a shared database.',
+    copy: 'Events between services, not direct calls.',
     detail:
-      'Kafka carries events between services so they do not integrate through one shared database.',
+      'Kafka carries events between services so they communicate through contracts, not coupling.',
     Icon: SiApachekafka,
   },
 ];
@@ -371,14 +365,14 @@ export const lifecycle: LifecycleStage[] = [
     name: 'Design',
     command: 'git checkout --track',
     copy: 'Service boundary, Keycloak role, Kafka contract.',
-    outcome: 'A Quarkus service with an owner.',
+    outcome: 'A Quarkus service with a clear owner.',
     Icon: GitBranch,
   },
   {
     number: '02',
     name: 'Build',
     command: './mvnw quarkus:build',
-    copy: 'Compile, test, and scan with Trivy. Maven runs in a container with memory isolation so open-files errors do not kill the build.',
+    copy: 'Compile, test, and scan with Trivy. Maven runs in a container with memory isolation.',
     outcome: 'An image plus a Trivy report.',
     Icon: Braces,
   },
@@ -403,7 +397,7 @@ export const lifecycle: LifecycleStage[] = [
 export const principles: { title: string; copy: string; Icon: LucideIcon }[] = [
   {
     title: 'Platform as product',
-    copy: 'Defaults and a cluster layout I can explain, because I installed it.',
+    copy: 'Standardized configurations and reproducible platform layouts designed for reliability and ease of operations.',
     Icon: Cloud,
   },
   {
@@ -425,9 +419,9 @@ export const navItems = [
     preview: 'Kalash, photography, IT, and the mountains still called home.',
     href: '/about/',
   },
-  { id: 'experience', label: 'Experience', preview: 'IT22 from Jan 2023. ESOLS Aug 2021–Jan 2023.' },
-  { id: 'work', label: 'Work', preview: 'Three views of the IT22 job, plus quarkus-doctor.' },
-  { id: 'approach', label: 'Approach', preview: 'The IT22 path from Git to OpenShift. Not another job.' },
-  { id: 'now', label: 'Now', preview: 'Employed at IT22 B.V. in Islamabad.' },
-  { id: 'contact', label: 'Contact', preview: 'Email, phone, CV, GitHub, LinkedIn.' },
+  { id: 'experience', label: 'Experience', preview: 'Backend and platform engineering from Jan 2023. Node.js work before that.' },
+  { id: 'work', label: 'Work', preview: 'Four selected pieces of work: backend services, on-prem platforms, GitOps delivery, and a public Quarkus tool.' },
+  { id: 'now', label: 'Contact', preview: 'Email, phone, CV, GitHub, LinkedIn.' },
 ] as const;
+
+export type NavItem = (typeof navItems)[number];

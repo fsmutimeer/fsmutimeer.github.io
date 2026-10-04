@@ -1,65 +1,150 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import Lenis from 'lenis';
 import { aboutStory } from '@/lib/about';
-import { profile } from '@/lib/profile';
-import { withBasePath } from '@/lib/base-path';
-import { SceneFallback } from './scene/fallback';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
+import { Nav } from './nav';
+import { Cursor } from './cursor';
+
+import 'lenis/dist/lenis.css';
+
+
 
 function PhotoPlaceholder({
   slot,
   caption,
-  src,
+  aspectHint,
+  objectPosition,
 }: {
   slot: string;
   caption: string;
-  src?: string;
+  aspectHint?: string;
+  objectPosition?: string;
 }) {
+  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
+  const imgSrc = `/about/${slot}.jpg`;
+
+  /* Resolve the CSS aspect-ratio for the loaded photo vs the placeholder */
+  const loadedAspect = aspectHint ?? '4 / 5';
+  const placeholderAspect = '4 / 5';
+
   return (
     <figure className="story-figure">
-      {src ? (
-        <img className="story-photo" src={withBasePath(src)} alt={caption} />
-      ) : (
+      {status !== 'error' ? (
+        <Image
+          className="story-photo"
+          src={imgSrc}
+          alt={caption}
+          width={960}
+          height={640}
+          onLoad={() => setStatus('loaded')}
+          onError={() => setStatus('error')}
+          style={{
+            ...(status === 'loading'
+              ? { visibility: 'hidden', position: 'absolute' }
+              : {
+                  aspectRatio: loadedAspect,
+                  objectPosition: objectPosition ?? 'center center',
+                }),
+          }}
+        />
+      ) : null}
+
+      {status !== 'loaded' ? (
         <div
           className="story-photo-slot"
           data-photo-slot={slot}
           role="img"
           aria-label={`${caption}. Placeholder until the photo is added.`}
+          style={{ aspectRatio: placeholderAspect }}
         >
           <span className="story-photo-mark mono">photo placeholder</span>
           <span className="story-photo-hint mono">public/about/{slot}.jpg</span>
         </div>
-      )}
-      <figcaption className="mono">{caption}</figcaption>
+      ) : null}
+
+      {/* Show the real caption only when the photo is loaded */}
+      {status === 'loaded' ? (
+        <figcaption className="mono">{caption}</figcaption>
+      ) : null}
     </figure>
   );
 }
 
 export function AboutStory() {
-  const home = withBasePath('/');
-  const work = withBasePath('/#work');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
+  const lenisRef = useRef<Lenis | null>(null);
+
+  /* ── Lenis smooth-scroll (mirrors portfolio.tsx) ── */
+  useEffect(() => {
+    if (reducedMotion) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      smoothWheel: true,
+      touchMultiplier: 1.15,
+    });
+    lenisRef.current = lenis;
+
+    const raf = (time: number) => {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    };
+    const id = requestAnimationFrame(raf);
+
+    /* Anchor-link click handling */
+    const onClick = (event: MouseEvent) => {
+      const target = (event.target as HTMLElement | null)?.closest(
+        'a[href^="#"]',
+      ) as HTMLAnchorElement | null;
+      if (!target) return;
+      const hash = target.getAttribute('href');
+      if (!hash || hash === '#') return;
+      const el = document.querySelector(hash);
+      if (!el) return;
+      event.preventDefault();
+      lenis.scrollTo(el as HTMLElement, { offset: -72 });
+    };
+    document.addEventListener('click', onClick);
+
+    return () => {
+      cancelAnimationFrame(id);
+      document.removeEventListener('click', onClick);
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, [reducedMotion]);
+
+  /* ── Pause / resume on menu open ── */
+  useEffect(() => {
+    const lenis = lenisRef.current;
+    if (menuOpen) {
+      lenis?.stop();
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      lenis?.start();
+    }
+  }, [menuOpen]);
 
   return (
-    <main className="portfolio-shell">
-      <SceneFallback />
+    <main className="portfolio-shell about-page">
       <div className="grain" aria-hidden="true" />
-      <article className="study story">
-        <header className="study-bar">
-          <div className="container study-bar-inner">
-            <a className="brand" href={home}>
-              <span className="brand-mark">{profile.initials}</span>
-              <span>
-                {profile.name}
-                <span className="brand-dot">.</span>
-              </span>
-            </a>
-            <nav className="study-bar-links" aria-label="About page">
-              <a href={home}>Home</a>
-              <a href={work}>Selected work</a>
-              <a href={profile.cvUrl} target="_blank" rel="noopener noreferrer">
-                CV
-              </a>
-            </nav>
-          </div>
-        </header>
+      <Cursor />
 
+      <Nav
+        menuOpen={menuOpen}
+        onToggle={() => setMenuOpen((v) => !v)}
+        onClose={() => setMenuOpen(false)}
+        minimal
+      />
+
+      <article className="story">
         <div className="container study-body">
           <p className="eyebrow mono">{aboutStory.eyebrow}</p>
           <h1 className="study-title">{aboutStory.title}</h1>
@@ -76,7 +161,8 @@ export function AboutStory() {
               <PhotoPlaceholder
                 slot={section.photoSlot}
                 caption={section.photoCaption}
-                src={section.photoSrc}
+                aspectHint={section.aspectHint}
+                objectPosition={section.objectPosition}
               />
               <div className="story-copy">
                 <span className="story-no mono">{section.number}</span>
@@ -91,12 +177,12 @@ export function AboutStory() {
           <p className="story-signoff">{aboutStory.signoff}</p>
 
           <div className="study-footer">
-            <a className="text-link" href={home}>
+            <Link className="text-link" href="/">
               Back to the portfolio
-            </a>
-            <a className="text-link" href={work}>
+            </Link>
+            <Link className="text-link" href="/#work">
               Selected work
-            </a>
+            </Link>
           </div>
         </div>
       </article>

@@ -4,8 +4,10 @@ export type AboutSection = {
   title: string;
   photoSlot: string;
   photoCaption: string;
-  /** Set to `/about/{photoSlot}.jpg` once the file is in `public/about`. */
-  photoSrc?: string;
+  /** Hint for aspect ratio when the real photo is loaded. */
+  aspectHint?: '3/2' | '4/3' | '4/5';
+  /** CSS object-position for the loaded photo. */
+  objectPosition?: string;
   paragraphs: string[];
 };
 
@@ -20,7 +22,9 @@ export const aboutStory = {
       number: '01',
       title: 'Where I Come From',
       photoSlot: 'where-i-come-from',
-      photoCaption: 'Kalash valleys — photo coming later',
+      photoCaption: 'The Kalash valleys, where I was born and raised.',
+      aspectHint: '3/2',
+      objectPosition: 'center 40%',
       paragraphs: [
         'I was born and raised in the Kalash valleys, surrounded by mountains, rivers, and a community with its own traditions, festivals, and way of life. I spent my early years and education there before moving to Chitral to continue my studies.',
         'Growing up in a place like that, you don\'t always realize how much it shapes you. When you are young, the mountains are simply where you live, the traditions are simply part of everyday life, and the people around you are simply your community. It is only after you leave that you begin to understand how much of yourself came from that place.',
@@ -34,7 +38,9 @@ export const aboutStory = {
       number: '02',
       title: 'A Camera in My Hands',
       photoSlot: 'camera-in-my-hands',
-      photoCaption: 'Photography — photo coming later',
+      photoCaption: 'Behind the lens — photography has been part of my life since 2014.',
+      aspectHint: '3/2',
+      objectPosition: 'center 35%',
       paragraphs: [
         'In 2014, I became interested in photography. I still do it from time to time and share some of my work on Instagram. Photography was one of the first things that taught me to pay attention to details and look at things differently. It is still something I enjoy, even though I don\'t have as much time for it now.',
         'That same year, I started working as a Non-Linear Video Editor at Leyenda Films in Islamabad, where I worked until 2017. It was my first professional experience, and it was also a time when I was still figuring out what I wanted to do with my career.',
@@ -83,7 +89,9 @@ export const aboutStory = {
       number: '06',
       title: 'Finding My Way Back Home',
       photoSlot: 'way-back-home',
-      photoCaption: 'Back toward the mountains — photo coming later',
+      photoCaption: 'The road back toward the mountains.',
+      aspectHint: '4/5',
+      objectPosition: 'center center',
       paragraphs: [
         'One of my long-term goals is to be able to work remotely from the mountains where I grew up and eventually spend the rest of my life there.',
         'Technology has taken me far from home, while the same technology is also what I hope will eventually allow me to return.',

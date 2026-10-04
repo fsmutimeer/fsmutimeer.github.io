@@ -1,327 +1,266 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { ChevronRight, X, ArrowUpRight } from 'lucide-react';
-import gsap from 'gsap';
-import { projects, type Project } from '@/lib/content';
-import { withBasePath } from '@/lib/base-path';
-import { sceneState } from '@/lib/scene-state';
-import { Magnetic } from './magnetic';
-import { SplitTitle } from './split-title';
-import { WorkDiagram } from './work-diagram';
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import Link from "next/link";
+import { ArrowUpRight, Github } from "lucide-react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { projects } from "@/lib/content";
+import { withBasePath } from "@/lib/base-path";
+import { sceneState } from "@/lib/scene-state";
+import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
+import { SplitTitle } from "./split-title";
+import { WorkDiagram } from "./work-diagram";
 
-export function Work({
-  onOpenBrief,
-}: {
-  onOpenBrief: (project: Project, origin: DOMRect) => void;
-}) {
+export function Work() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [pinnedIndex, setPinnedIndex] = useState(0);
+  const charAnimRef = useRef<gsap.core.Tween | null>(null);
+  const reducedMotion = usePrefersReducedMotion();
 
-  useEffect(() => sceneState.subscribe((snapshot) => {
-    setPinnedIndex(snapshot.workIndex);
-  }), []);
+  useEffect(
+    () =>
+      sceneState.subscribe((snapshot) => {
+        setPinnedIndex(snapshot.workIndex);
+      }),
+    [],
+  );
+
+  /* ── Staggered title char morph on active card change ── */
+  useEffect(() => {
+    if (reducedMotion) return;
+    const el = document.querySelector<HTMLElement>(
+      `[data-work-index="${pinnedIndex}"]`,
+    );
+    if (!el) return;
+    const chars = el.querySelectorAll<HTMLElement>(".work-title-char");
+    if (!chars.length) return;
+    charAnimRef.current?.kill();
+    charAnimRef.current = gsap.fromTo(
+      chars,
+      { opacity: 0, y: 10 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.45,
+        stagger: 0.022,
+        ease: "power3.out",
+        clearProps: "transform,opacity",
+      },
+    );
+  }, [pinnedIndex, reducedMotion]);
+
+  const goToCard = (index: number) => {
+    const clamped = Math.max(0, Math.min(projects.length - 1, index));
+    const trigger = ScrollTrigger.getById("work-pinned-track");
+    if (!trigger) {
+      const panel = document.querySelector(`[data-work-index="${clamped}"]`);
+      panel?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      return;
+    }
+    const progress = clamped / Math.max(1, projects.length - 1);
+    const targetScroll = trigger.start + (trigger.end - trigger.start) * progress;
+    const lenis = (window as unknown as { __lenis?: { scrollTo: (t: number) => void } }).__lenis;
+    if (lenis) {
+      lenis.scrollTo(targetScroll);
+    } else {
+      window.scrollTo({ top: targetScroll, behavior: "smooth" });
+    }
+  };
 
   return (
     <section className="section work" id="work" aria-labelledby="work-heading">
       <div className="work-pin">
+
+        {/* ── Section header ── */}
         <div className="container work-head">
           <div>
             <div className="section-label mono">03 / selected work</div>
-            <SplitTitle id="work-heading" lines={['Four pieces', 'of work.']} />
+            <SplitTitle id="work-heading" lines={["Four pieces", "of work."]} />
           </div>
-          <p className="section-intro">
-            Cards 01–03 are parts of the same IT22 job. Card 04 is a public tool I wrote. IT22 pages
-            omit customer names and unpublished numbers.
-          </p>
+          <div className="work-head-right">
+            <p className="section-intro">
+              Three connected pieces of backend and platform work: services,
+              on-prem clusters, and GitOps delivery. The fourth is my public
+              Quarkus configuration tool. Proprietary details remain private.
+            </p>
+          </div>
         </div>
-        <div className="work-track">
-          {projects.map((project, index) => (
-            <Magnetic className="work-panel-magnet" key={project.number} strength={0.08}>
-              <article
-                className="work-panel"
-                data-testid={`card-project-${project.number}`}
-                data-work-index={index}
-                data-cursor="hover"
-                data-cursor-label="inspect"
-                onPointerEnter={() => setHovered(index)}
-                onPointerLeave={() => setHovered(null)}
-              >
-                <WorkDiagram
-                  number={project.number}
-                  active={hovered === index || (hovered === null && pinnedIndex === index)}
-                />
-                <div className="work-panel-no mono">{project.number}</div>
-                <div className="project-sub mono">{project.scope}</div>
-                <div className="project-sub mono">{project.subtitle}</div>
-                <h3>{project.title}</h3>
-                <p data-testid={`text-project-copy-${project.number}`}>{project.copy}</p>
-                <div className="tags">
-                  {project.tags.map((tag) => (
-                    <span className="pill pill-accent" key={tag}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="work-metrics">
-                  {project.metrics.map((metric) => (
-                    <div className="metric mono" key={metric}>
-                      {metric}
+
+        {/* ── Horizontal Card stage ── */}
+        <div className="work-stage">
+          <div
+            className="work-track"
+            onFocusCapture={(event) => {
+              if (window.matchMedia("(max-width: 899px)").matches) return;
+              if (!(event.target instanceof HTMLElement)) return;
+              const panel = event.target.closest<HTMLElement>(".work-panel");
+              const trigger = ScrollTrigger.getById("work-pinned-track");
+              if (!panel || !trigger) return;
+              const index = Number(panel.dataset.workIndex ?? 0);
+              if (sceneState.get().workIndex === index) return;
+              const progress = index / Math.max(1, projects.length - 1);
+              trigger.scroll(trigger.start + (trigger.end - trigger.start) * progress);
+              ScrollTrigger.update();
+            }}
+          >
+            {projects.map((project, index) => (
+              <div className="work-panel-magnet" key={project.number}>
+                <article
+                  className={`work-panel${pinnedIndex === index ? " is-active" : ""}`}
+                  data-testid={`card-project-${project.number}`}
+                  data-work-index={index}
+                  data-cursor="hover"
+                  data-cursor-label={pinnedIndex === index ? "inspect" : "view"}
+                  onClick={(e) => {
+                    if ((e.target as HTMLElement).closest("a, button")) return;
+                    if (pinnedIndex !== index) goToCard(index);
+                  }}
+                  onPointerEnter={(event) => {
+                    if (event.pointerType !== "touch") setHovered(index);
+                  }}
+                  onPointerLeave={(event) => {
+                    if (!event.currentTarget.matches(":focus-within")) setHovered(null);
+                  }}
+                  onFocusCapture={() => setHovered(index)}
+                  onBlurCapture={(event) => {
+                    const rel = event.relatedTarget;
+                    if (!(rel instanceof Node) || !event.currentTarget.contains(rel)) {
+                      setHovered(null);
+                    }
+                  }}
+                >
+                  {/* ── Terminal top bar ── */}
+                  <div className="work-panel-terminal" aria-hidden="true">
+                    <div className="terminal-dots">
+                      <span className="terminal-dot td-red" />
+                      <span className="terminal-dot td-yellow" />
+                      <span className="terminal-dot td-green" />
                     </div>
-                  ))}
-                </div>
-                <div className="work-panel-actions">
-                  <a
-                    className="text-link"
-                    href={withBasePath(`/work/${project.slug}/`)}
-                    data-testid={`link-case-study-${project.number}`}
-                    data-cursor="hover"
-                    data-cursor-label="open"
-                  >
-                    Read the case study <ArrowUpRight size={12} aria-hidden="true" />
-                  </a>
-                  <button
-                    className="text-link brief-button"
-                    type="button"
-                    data-testid={`button-read-brief-${project.number}`}
-                    data-cursor="hover"
-                    data-cursor-label="inspect"
-                    onClick={(event) => {
-                      const panel = (event.currentTarget as HTMLElement).closest('.work-panel');
-                      onOpenBrief(project, (panel ?? event.currentTarget).getBoundingClientRect());
-                    }}
-                  >
-                    Read the brief <ChevronRight size={12} aria-hidden="true" />
-                  </button>
-                  {project.href && (
-                    <a
-                      className="text-link"
-                      href={project.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-testid={`link-project-docs-${project.number}`}
-                      data-cursor="hover"
-                      data-cursor-label="open"
-                    >
-                      {project.hrefLabel ?? 'Documentation'} <ArrowUpRight size={12} aria-hidden="true" />
-                    </a>
-                  )}
-                </div>
-              </article>
-            </Magnetic>
-          ))}
+                    <span className="terminal-label mono">
+                      {project.number} — {project.scope}
+                    </span>
+                    <span className={`terminal-status mono${pinnedIndex === index ? " is-live" : ""}`}>
+                      {pinnedIndex === index ? "● active" : "○ standby"}
+                    </span>
+                  </div>
+
+                  {/* ── Split‑panel content body ── */}
+                  <div className="work-panel-body">
+                    <div className="work-panel-main">
+                      <div className="work-panel-copy">
+                        <div className="work-panel-head">
+                          <span className="work-panel-no mono">{project.number}</span>
+                          <span className="project-sub mono">{project.scope}</span>
+                        </div>
+
+                        {/* Title with individual char spans for morph animation */}
+                        <h3 className="work-panel-title" aria-label={project.title}>
+                          {project.title.split("").map((char, ci) => (
+                            <span
+                              key={ci}
+                              className="work-title-char"
+                              aria-hidden="true"
+                            >
+                              {char === " " ? "\u00a0" : char}
+                            </span>
+                          ))}
+                        </h3>
+
+                        <p data-testid={`text-project-copy-${project.number}`}>
+                          {project.copy}
+                        </p>
+                      </div>
+
+                      <div className="work-panel-visual" aria-hidden="true">
+                        <WorkDiagram
+                          number={project.number}
+                          active={
+                            hovered === index ||
+                            (hovered === null && pinnedIndex === index)
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="work-panel-footer">
+                      <div className="tags" aria-label={`Tech stack for ${project.title}`}>
+                        {project.tags.map((tag) => (
+                          <span className="tag mono" key={tag}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {project.metrics && project.metrics.length > 0 && (
+                        <div
+                          className="work-metrics"
+                          aria-label={`Impact metrics for ${project.title}`}
+                        >
+                          {project.metrics.map((metric) => (
+                            <span className="work-metric mono" key={metric}>
+                              {metric}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="work-panel-actions">
+                        {project.slug && (
+                          <Link
+                            className="work-case-link"
+                            href={withBasePath(`/work/${project.slug}`)}
+                            data-testid={`link-case-study-${project.number}`}
+                            data-cursor="hover"
+                            data-cursor-label="case study"
+                          >
+                            Read the case study <ArrowUpRight size={14} aria-hidden="true" />
+                          </Link>
+                        )}
+                        {project.href && (
+                          <a
+                            className="text-link"
+                            href={project.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid={`link-project-documentation-${project.number}`}
+                            data-cursor="hover"
+                            data-cursor-label="docs"
+                          >
+                            {project.hrefLabel ?? "Documentation"} <ArrowUpRight size={12} aria-hidden="true" />
+                          </a>
+                        )}
+                        {project.repoUrl && (
+                          <a
+                            className="text-link work-source-link"
+                            href={project.repoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid={`link-project-repository-${project.number}`}
+                            data-cursor="hover"
+                            data-cursor-label="source"
+                          >
+                            <Github size={14} aria-hidden="true" /> GitHub
+                            <ArrowUpRight size={12} aria-hidden="true" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* ── Scroll‑progress strip (sleek line without label numbers) ── */}
+        <div className="work-progress-strip" aria-hidden="true">
+          <div className="work-progress-rail">
+            <div className="work-progress-fill" id="work-progress-fill" />
+          </div>
+        </div>
+
       </div>
     </section>
-  );
-}
-
-export function BriefDialog({
-  project,
-  origin,
-  onClose,
-}: {
-  project: Project;
-  origin: DOMRect | null;
-  onClose: () => void;
-}) {
-  const backdropRef = useRef<HTMLDivElement>(null);
-  const dialogRef = useRef<HTMLElement>(null);
-  const closingRef = useRef(false);
-
-  useEffect(() => {
-    const backdrop = backdropRef.current;
-    const dialog = dialogRef.current;
-    if (!backdrop || !dialog) return;
-
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || !origin) {
-      gsap.set(backdrop, { opacity: 1 });
-      gsap.set(dialog, { clearProps: 'transform,clipPath' });
-      return;
-    }
-
-    const dest = dialog.getBoundingClientRect();
-    const scaleX = origin.width / dest.width;
-    const scaleY = origin.height / dest.height;
-    const dx = origin.left + origin.width / 2 - (dest.left + dest.width / 2);
-    const dy = origin.top + origin.height / 2 - (dest.top + dest.height / 2);
-
-    gsap.set(backdrop, { opacity: 0 });
-    gsap.set(dialog, {
-      x: dx,
-      y: dy,
-      scaleX,
-      scaleY,
-      clipPath: 'inset(12% 12% 12% 12%)',
-      transformOrigin: 'center center',
-    });
-
-    const intro = gsap.timeline();
-    intro.to(backdrop, { opacity: 1, duration: 0.35, ease: 'power2.out' }, 0);
-    intro.to(
-      dialog,
-      {
-        x: 0,
-        y: 0,
-        scaleX: 1,
-        scaleY: 1,
-        clipPath: 'inset(0% 0% 0% 0%)',
-        duration: 0.55,
-        ease: 'power3.out',
-      },
-      0,
-    );
-
-    return () => {
-      intro.kill();
-    };
-  }, [origin, project]);
-
-  const dismiss = () => {
-    if (closingRef.current) return;
-    const backdrop = backdropRef.current;
-    const dialog = dialogRef.current;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || !origin || !backdrop || !dialog) {
-      onClose();
-      return;
-    }
-
-    closingRef.current = true;
-    const dest = dialog.getBoundingClientRect();
-    const scaleX = origin.width / dest.width;
-    const scaleY = origin.height / dest.height;
-    const dx = origin.left + origin.width / 2 - (dest.left + dest.width / 2);
-    const dy = origin.top + origin.height / 2 - (dest.top + dest.height / 2);
-
-    const outro = gsap.timeline({
-      onComplete: onClose,
-    });
-    outro.to(backdrop, { opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
-    outro.to(
-      dialog,
-      {
-        x: dx,
-        y: dy,
-        scaleX,
-        scaleY,
-        clipPath: 'inset(12% 12% 12% 12%)',
-        duration: 0.4,
-        ease: 'power3.in',
-      },
-      0,
-    );
-  };
-
-  return (
-    <div
-      className="dialog-backdrop"
-      role="presentation"
-      ref={backdropRef}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) dismiss();
-      }}
-    >
-      <section
-        className="brief-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="brief-title"
-        data-testid="dialog-project-brief"
-        ref={dialogRef}
-      >
-        <div className="dialog-head">
-          <div>
-            <div className="dialog-number">{project.number} / SYSTEM BRIEF</div>
-            <h2 className="dialog-title" id="brief-title">
-              {project.title}
-            </h2>
-          </div>
-          <button
-            className="dialog-close"
-            type="button"
-            aria-label="Close project brief"
-            data-testid="button-close-brief"
-            data-cursor="hover"
-            data-cursor-label="close"
-            onClick={dismiss}
-          >
-            <X size={18} aria-hidden="true" />
-          </button>
-        </div>
-        <div className="dialog-body">
-          <div className="project-sub mono">{project.scope}</div>
-          <div className="project-sub mono">{project.subtitle}</div>
-          <p>{project.detail}</p>
-          <div className="detail-grid">
-            <div className="detail-box">
-              <strong>What this is</strong>
-              <span>{project.metrics.join(' · ')}</span>
-            </div>
-            <div className="detail-box">
-              <strong>Role</strong>
-              <span>{project.role}</span>
-            </div>
-            <div className="detail-box">
-              <strong>Outcome</strong>
-              <span>{project.outcome}</span>
-            </div>
-            <div className="detail-box">
-              <strong>Tools in the path</strong>
-              <span>{project.tags.join(' · ')}</span>
-            </div>
-          </div>
-          <div className="dialog-footer">
-            <a
-              className="text-link"
-              href={withBasePath(`/work/${project.slug}/`)}
-              data-testid="link-brief-case-study"
-              data-cursor="hover"
-              data-cursor-label="open"
-              onClick={dismiss}
-            >
-              Read the full case study <ArrowUpRight size={14} aria-hidden="true" />
-            </a>
-            {project.href && (
-              <a
-                className="text-link"
-                href={project.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="link-brief-docs"
-                data-cursor="hover"
-                data-cursor-label="open"
-              >
-                {project.hrefLabel ?? 'Documentation'} <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
-            )}
-            {project.repoUrl && (
-              <a
-                className="text-link"
-                href={project.repoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="link-brief-repo"
-                data-cursor="hover"
-                data-cursor-label="open"
-              >
-                Source <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
-            )}
-            <a
-              className="text-link"
-              href="#contact"
-              data-testid="link-brief-contact"
-              data-cursor="hover"
-              data-cursor-label="talk"
-              onClick={dismiss}
-            >
-              Contact <ArrowUpRight size={14} aria-hidden="true" />
-            </a>
-          </div>
-        </div>
-      </section>
-    </div>
   );
 }

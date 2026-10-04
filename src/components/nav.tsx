@@ -1,19 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { navItems } from '@/lib/content';
-import { profile } from '@/lib/profile';
-import { withBasePath } from '@/lib/base-path';
-import { Magnetic } from './magnetic';
-import { scrambleTo } from '@/lib/scramble';
-import { requestInspectFrame } from './inspect-grid';
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { navItems } from "@/lib/content";
+import { profile } from "@/lib/profile";
+import { sceneState, type SceneSection } from "@/lib/scene-state";
+import { withBasePath } from "@/lib/base-path";
+import { useModalFocus } from "@/lib/use-modal-focus";
+import { Magnetic } from "./magnetic";
+import { scrambleTo } from "@/lib/scramble";
 
-const sections = [
-  { id: 'top', label: 'Home', preview: 'Software engineer at IT22. Backend and platform work.' },
-  ...navItems,
-] as const;
+const homeSection = {
+  id: "top",
+  label: "Home",
+  preview: "Backend and platform engineer. Java, Quarkus, Kafka, and OpenShift.",
+  href: undefined,
+} as const;
+const sections = [homeSection, ...navItems] as const;
 
 function OverlayLabel({ text, scramble }: { text: string; scramble: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -28,34 +34,52 @@ function OverlayLabel({ text, scramble }: { text: string; scramble: boolean }) {
     return scrambleTo(node, text, 0.45);
   }, [scramble, text]);
 
-  return <span ref={ref} className="nav-overlay-label">{text}</span>;
+  return (
+    <span ref={ref} className="nav-overlay-label">
+      {text}
+    </span>
+  );
 }
 
 export function Nav({
   menuOpen,
   onToggle,
   onClose,
+  minimal = false,
 }: {
   menuOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
+  /** When true, strip portfolio HUD chrome (counter and company). */
+  minimal?: boolean;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLElement>(null);
   const maskRef = useRef<HTMLDivElement>(null);
-  const [activeId, setActiveId] = useState('top');
+  const pathname = usePathname();
+  const isHomePage = pathname === "/" || pathname === "";
+  const brandHref = isHomePage ? "#top" : withBasePath("/");
+  const [activeId, setActiveId] = useState("top");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const previewId = hoveredId ?? activeId;
-  const previewItem = sections.find((item) => item.id === previewId) ?? sections[0];
-  const previewIndex = sections.findIndex((item) => item.id === previewItem.id) + 1;
+  const previewItem =
+    sections.find((item) => item.id === previewId) ?? sections[0];
+  const previewIndex = Math.max(
+    0,
+    navItems.findIndex((item) => item.id === previewItem.id) + 1,
+  );
   const activeIndex = Math.max(
-    1,
-    sections.findIndex((item) => item.id === activeId) + 1,
+    0,
+    navItems.findIndex((item) => item.id === activeId) + 1,
   );
 
+  useModalFocus(dialogRef, menuOpen, onClose);
+
   useEffect(() => {
+    setActiveId(isHomePage ? "top" : "about");
     const nodes = sections
       .map(({ id }) => document.getElementById(id))
       .filter((node): node is HTMLElement => Boolean(node));
@@ -68,12 +92,12 @@ export function Nav({
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (visible?.target.id) setActiveId(visible.target.id);
       },
-      { rootMargin: '-28% 0px -55% 0px', threshold: [0.1, 0.35, 0.6] },
+      { rootMargin: "-28% 0px -55% 0px", threshold: [0.1, 0.35, 0.6] },
     );
 
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, []);
+  }, [isHomePage]);
 
   useEffect(() => {
     const update = () => {
@@ -81,19 +105,9 @@ export function Nav({
       setProgress(max > 0 ? Math.min(1, window.scrollY / max) : 0);
     };
     update();
-    window.addEventListener('scroll', update, { passive: true });
-    return () => window.removeEventListener('scroll', update);
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
   }, []);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    closeRef.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
-  }, [menuOpen, onClose]);
 
   useEffect(() => {
     if (!menuOpen) setHoveredId(null);
@@ -103,14 +117,14 @@ export function Nav({
     const list = listRef.current;
     const mask = maskRef.current;
     if (!menuOpen || !list || !mask) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (window.matchMedia('(pointer: coarse)').matches) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(pointer: coarse)").matches) {
       gsap.set(mask, { autoAlpha: 0 });
       return;
     }
 
     const target = list.querySelector<HTMLElement>(
-      `.nav-overlay-link[href="#${previewId}"]`,
+      `.nav-overlay-link[data-nav-id="${previewId}"]`,
     );
     if (!target) return;
 
@@ -124,15 +138,15 @@ export function Nav({
         width: targetRect.width,
         height: targetRect.height,
         duration,
-        ease: 'power3.out',
-        overwrite: 'auto',
+        ease: "power3.out",
+        overwrite: "auto",
         onComplete: () => {
-          mask.dataset.placed = 'true';
+          mask.dataset.placed = "true";
         },
       });
     };
 
-    const instant = mask.dataset.placed !== 'true';
+    const instant = mask.dataset.placed !== "true";
     if (instant) {
       const delayed = gsap.delayedCall(0.62, () => place(0));
       return () => {
@@ -146,37 +160,60 @@ export function Nav({
     if (menuOpen) return;
     const mask = maskRef.current;
     if (!mask) return;
-    mask.dataset.placed = '';
+    mask.dataset.placed = "";
     gsap.set(mask, { autoAlpha: 0, width: 0, height: 0, x: 0, y: 0 });
   }, [menuOpen]);
 
   useGSAP(
     () => {
       if (!menuOpen || !overlayRef.current) return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       gsap.fromTo(
-        '.nav-overlay-link',
+        ".nav-overlay-link",
         { y: 36, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.55, stagger: 0.07, ease: 'power3.out', delay: 0.08 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.55,
+          stagger: 0.07,
+          ease: "power3.out",
+          delay: 0.08,
+        },
       );
       gsap.fromTo(
-        '.nav-overlay-meta > *',
+        ".nav-overlay-meta > *",
         { y: 16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: 'power3.out', delay: 0.28 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.5,
+          stagger: 0.08,
+          ease: "power3.out",
+          delay: 0.28,
+        },
       );
     },
     { dependencies: [menuOpen] },
   );
 
   return (
-    <header className="hud" data-open={menuOpen}>
-      <div className="hud-progress" aria-hidden="true">
-        <span style={{ transform: `scaleX(${progress})` }} />
-      </div>
+    <header
+      className="hud"
+      data-open={menuOpen}
+      ref={dialogRef}
+      role={menuOpen ? "dialog" : undefined}
+      aria-modal={menuOpen ? true : undefined}
+      aria-label={menuOpen ? "Site index" : undefined}
+    >
+      {!minimal && (
+        <div className="hud-progress" aria-hidden="true">
+          <span style={{ transform: `scaleX(${progress})` }} />
+        </div>
+      )}
       <div className="container hud-bar">
         <div className="hud-start">
-          <a
-            href="#top"
+          <Link
+            href={brandHref}
             className="brand"
             data-testid="link-brand"
             data-cursor="hover"
@@ -188,42 +225,34 @@ export function Nav({
               {profile.name}
               <span className="brand-dot">.</span>
             </span>
-          </a>
-          <button
-            className="inspect-btn mono"
-            type="button"
-            aria-label="Frame the current heading"
-            data-cursor="hover"
-            data-cursor-label="inspect"
-            onClick={(event) => {
-              event.preventDefault();
-              requestInspectFrame();
-            }}
-          >
-            inspect
-          </button>
+          </Link>
         </div>
         <div className="hud-end">
-          <div className="status" hidden={menuOpen}>
-            <span className="status-dot" />
-            <span>
-              {String(activeIndex).padStart(2, '0')} / {String(sections.length).padStart(2, '0')}
-            </span>
-            <span className="status-copy">at {profile.company}</span>
-          </div>
+          {!minimal && (
+            <div className="status" hidden={menuOpen}>
+              <span className="status-dot" />
+              <span>
+                {String(activeIndex).padStart(2, "0")} /{" "}
+                {String(navItems.length).padStart(2, "0")}
+              </span>
+              <span className="status-copy">backend & platform</span>
+            </div>
+          )}
           <button
             className="index-btn"
             type="button"
             ref={closeRef}
-            aria-label={menuOpen ? 'Close site index' : 'Open site index'}
+            aria-label={menuOpen ? "Close site menu" : "Open site menu"}
             aria-expanded={menuOpen}
             aria-controls="site-index"
             data-testid="button-mobile-menu"
             data-cursor="hover"
-            data-cursor-label={menuOpen ? 'close' : 'index'}
+            data-cursor-label={menuOpen ? "close" : "menu"}
             onClick={onToggle}
           >
-            <span className="index-btn-label mono">{menuOpen ? 'Close' : 'Index'}</span>
+            <span className="index-btn-label mono">
+              {menuOpen ? "Close" : "MENU"}
+            </span>
             <span className="index-burger" aria-hidden="true">
               <i />
               <i />
@@ -237,9 +266,6 @@ export function Nav({
         id="site-index"
         ref={overlayRef}
         hidden={!menuOpen}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Site index"
       >
         <div className="container nav-overlay-grid">
           <nav
@@ -248,49 +274,73 @@ export function Nav({
             ref={listRef}
             onPointerLeave={() => setHoveredId(null)}
           >
-            <div className="nav-overlay-mask" ref={maskRef} aria-hidden="true" />
-            {sections.map(({ id, label }, index) => (
-              <Magnetic key={id} strength={0.08}>
-                <a
-                  className={`nav-overlay-link${previewItem.id === id ? ' is-preview' : ''}`}
-                  href={`#${id}`}
-                  data-testid={id === 'top' ? 'link-nav-home' : `link-nav-${id}`}
-                  data-cursor="hover"
-                  data-cursor-label="open"
-                  aria-current={activeId === id ? 'location' : undefined}
-                  onPointerEnter={() => setHoveredId(id)}
-                  onMouseEnter={() => setHoveredId(id)}
-                  onFocus={() => setHoveredId(id)}
-                  onClick={onClose}
-                >
-                  <span className="nav-overlay-no mono">{String(index + 1).padStart(2, '0')}</span>
-                  <OverlayLabel text={label} scramble={hoveredId === id} />
-                </a>
-              </Magnetic>
-            ))}
+            <div
+              className="nav-overlay-mask"
+              ref={maskRef}
+              aria-hidden="true"
+            />
+            {sections.map((section, index) => {
+              const { id, label } = section;
+              const href =
+                "href" in section && section.href
+                  ? withBasePath(section.href)
+                  : id === "top"
+                    ? isHomePage
+                      ? "#top"
+                      : withBasePath("/")
+                    : isHomePage
+                      ? `#${id}`
+                      : `${withBasePath("/")}#${id}`;
+              const isPageLink = href.startsWith("/") && !href.startsWith("#");
+              return (
+                <Magnetic key={id} strength={0.08}>
+                  <Link
+                    className={`nav-overlay-link${previewItem.id === id ? " is-preview" : ""}`}
+                    href={href}
+                    data-nav-id={id}
+                    data-testid={
+                      id === "top" ? "link-nav-home" : `link-nav-${id}`
+                    }
+                    data-modal-autofocus={index === 0 ? "true" : undefined}
+                    data-cursor="hover"
+                    data-cursor-label={isPageLink ? "visit" : "open"}
+                    aria-current={activeId === id ? "location" : undefined}
+                    onPointerEnter={() => setHoveredId(id)}
+                    onMouseEnter={() => setHoveredId(id)}
+                    onFocus={() => setHoveredId(id)}
+                    onClick={onClose}
+                  >
+                    <span className="nav-overlay-no mono">
+                      {String(index === 0 ? 0 : index).padStart(2, "0")}
+                    </span>
+                    <OverlayLabel text={label} scramble={hoveredId === id} />
+                  </Link>
+                </Magnetic>
+              );
+            })}
           </nav>
           <aside className="nav-overlay-meta">
             <div className="nav-overlay-preview" aria-live="polite">
               <span className="nav-overlay-preview-no mono">
-                {String(previewIndex).padStart(2, '0')}
+                {String(previewIndex).padStart(2, "0")}
               </span>
               <p className="nav-overlay-preview-label">{previewItem.label}</p>
               <p>{previewItem.preview}</p>
             </div>
-            <p className="mono nav-overlay-kicker">employed</p>
+            <p className="mono nav-overlay-kicker">currently</p>
             <p>
-              Software engineer at {profile.company}
+              Backend & platform engineer
               <br />
               {profile.location}
             </p>
-            <p className="mono nav-overlay-inspect">ALT+G inspect</p>
-            <a href={withBasePath('/about/')} data-cursor="hover" data-cursor-label="story">
-              About me
-            </a>
-            <a href={`mailto:${profile.email}`} data-cursor="hover" data-cursor-label="mail">
+            <Link
+              href={`mailto:${profile.email}`}
+              data-cursor="hover"
+              data-cursor-label="mail"
+            >
               {profile.email}
-            </a>
-            <a
+            </Link>
+            <Link
               href={profile.cvUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -298,7 +348,7 @@ export function Nav({
               data-cursor-label="cv"
             >
               Download CV
-            </a>
+            </Link>
           </aside>
         </div>
       </div>

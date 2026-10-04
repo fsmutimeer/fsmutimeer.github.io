@@ -1,4 +1,4 @@
-export type SceneSection = 'hero' | 'about' | 'work' | 'approach' | 'contact';
+export type SceneSection = 'hero' | 'about' | 'experience' | 'work' | 'approach' | 'contact';
 
 type SceneSnapshot = {
   progress: number;

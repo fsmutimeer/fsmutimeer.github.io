@@ -22,8 +22,7 @@ export function Approach({
             <div className="section-label mono">04 / delivery path</div>
             <SplitTitle id="approach-heading" lines={['How a change', 'gets to OpenShift.']} />
             <p className="section-intro">
-              This is the IT22 delivery path, not another employer. The tools below are the ones on
-              the CV.
+              This is the engineering delivery path. The tools below represent the production architecture stack.
             </p>
           </div>
           <div className="stack-list" data-testid="list-capabilities">
@@ -66,8 +65,7 @@ export function Approach({
               />
             </div>
             <p className="section-intro">
-              Four technologies from the IT22 work. Pick one, then the stages below. This is still
-              the same job.
+              Key technologies across the backend and platform stack. Pick one to explore its role across the delivery cycle.
             </p>
           </div>
           <div className="technology-explorer">
@@ -109,7 +107,7 @@ export function Approach({
             <div className="lifecycle-heading">
               <div className="section-label mono">software life cycle</div>
               <span className="mono lifecycle-status">
-                <span /> IT22 path
+                <span /> Production path
               </span>
             </div>
             <div className="lifecycle-steps" role="tablist" aria-label="Software lifecycle stages">

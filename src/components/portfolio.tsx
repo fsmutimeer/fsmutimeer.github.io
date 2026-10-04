@@ -1,43 +1,58 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-import Lenis from 'lenis';
-import { ErrorBoundary } from '@/components/error-boundary';
-import { projects, technologies, type Project, type Technology } from '@/lib/content';
-import { sceneState } from '@/lib/scene-state';
-import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
-import { About } from './about';
-import { Approach } from './approach';
-import { Contact } from './contact';
-import { Cursor } from './cursor';
-import { Experience } from './experience';
-import { Hero } from './hero';
-import { InspectGrid } from './inspect-grid';
-import { Nav } from './nav';
-import { Preloader } from './preloader';
-import { SceneFallback } from './scene/fallback';
-import { BriefDialog, Work } from './work';
-import 'lenis/dist/lenis.css';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import Lenis from "lenis";
+import { projects } from "@/lib/content";
+import { sceneState, type SceneSection } from "@/lib/scene-state";
+import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
+import { About } from "./about";
+import { Contact } from "./contact";
+import { Cursor } from "./cursor";
+import { Experience } from "./experience";
+import { Hero } from "./hero";
+import { InspectGrid } from "./inspect-grid";
+import { Nav } from "./nav";
+import { Preloader } from "./preloader";
+import { Work } from "./work";
+import "lenis/dist/lenis.css";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const SceneCanvas = dynamic(
-  () => import('./scene/canvas').then((module) => module.SceneCanvas),
-  { ssr: false, loading: () => <SceneFallback /> },
-);
+let hasPreloadedInSession = false;
+
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  if (hasPreloadedInSession) return true;
+  if (typeof window !== "undefined") {
+    try {
+      if (sessionStorage.getItem("portfolio_preloaded") === "true") {
+        hasPreloadedInSession = true;
+        return true;
+      }
+    } catch {
+      // Ignore storage errors
+    }
+  }
+  return false;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 
 export function Portfolio() {
   const reducedMotion = usePrefersReducedMotion();
+  const alreadyPreloaded = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [briefOrigin, setBriefOrigin] = useState<DOMRect | null>(null);
-  const [selectedTechnology, setSelectedTechnology] = useState<Technology>(technologies[0]);
-  const [selectedStage, setSelectedStage] = useState(0);
   const [ready, setReady] = useState(false);
+  const isReady = ready || alreadyPreloaded || reducedMotion;
   const lenisRef = useRef<Lenis | null>(null);
   const rootRef = useRef<HTMLElement>(null);
 
@@ -47,20 +62,33 @@ export function Portfolio() {
     const lenis = lenisRef.current;
     if (menuOpen) {
       lenis?.stop();
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
       lenis?.start();
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [menuOpen]);
+
   const onPreloaderDone = useCallback(() => {
+    hasPreloadedInSession = true;
+    try {
+      sessionStorage.setItem("portfolio_preloaded", "true");
+    } catch {}
     setReady(true);
     sceneState.set({ ready: true });
     ScrollTrigger.refresh();
   }, []);
+
+  useEffect(() => {
+    if (alreadyPreloaded && !ready) {
+      setReady(true);
+      sceneState.set({ ready: true });
+      ScrollTrigger.refresh();
+    }
+  }, [alreadyPreloaded, ready]);
 
   useEffect(() => {
     if (reducedMotion) {
@@ -76,8 +104,8 @@ export function Portfolio() {
         mouseY: -(event.clientY / window.innerHeight) * 2 + 1,
       });
     };
-    window.addEventListener('mousemove', onMouse, { passive: true });
-    return () => window.removeEventListener('mousemove', onMouse);
+    window.addEventListener("mousemove", onMouse, { passive: true });
+    return () => window.removeEventListener("mousemove", onMouse);
   }, []);
 
   useEffect(() => {
@@ -89,7 +117,10 @@ export function Portfolio() {
       touchMultiplier: 1.15,
     });
     lenisRef.current = lenis;
-    lenis.on('scroll', () => {
+    if (typeof window !== "undefined") {
+      (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
+    }
+    lenis.on("scroll", () => {
       ScrollTrigger.update();
       sceneState.set({ scrollVelocity: lenis.velocity });
     });
@@ -105,8 +136,8 @@ export function Portfolio() {
         'a[href^="#"]',
       ) as HTMLAnchorElement | null;
       if (!target) return;
-      const hash = target.getAttribute('href');
-      if (!hash || hash === '#') return;
+      const hash = target.getAttribute("href");
+      if (!hash || hash === "#") return;
       const el = document.querySelector(hash);
       if (!el) return;
       event.preventDefault();
@@ -114,158 +145,218 @@ export function Portfolio() {
       closeMenu();
       lenis.scrollTo(el as HTMLElement, { offset: -72 });
     };
-    document.addEventListener('click', onClick);
+    document.addEventListener("click", onClick);
 
     return () => {
       gsap.ticker.remove(ticker);
-      document.removeEventListener('click', onClick);
+      document.removeEventListener("click", onClick);
       sceneState.set({ scrollVelocity: 0 });
+      if (typeof window !== "undefined") {
+        delete (window as unknown as { __lenis?: Lenis }).__lenis;
+      }
       lenis.destroy();
       lenisRef.current = null;
     };
   }, [reducedMotion]);
 
-  useEffect(() => {
-    if (!selectedProject) {
-      document.body.style.overflow = '';
-      lenisRef.current?.start();
-      return;
-    }
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setSelectedProject(null);
-    };
-    document.body.style.overflow = 'hidden';
-    lenisRef.current?.stop();
-    window.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.body.style.overflow = '';
-      lenisRef.current?.start();
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [selectedProject]);
 
   useGSAP(
     () => {
-      if (reducedMotion || !ready) return;
+      if (reducedMotion || !isReady) return;
 
-      const setSection = (section: 'hero' | 'about' | 'work' | 'approach' | 'contact') => {
+      const setSection = (section: SceneSection) => {
         sceneState.set({ section });
       };
 
       ScrollTrigger.create({
         trigger: document.documentElement,
-        start: 'top top',
-        end: 'bottom bottom',
+        start: "top top",
+        end: "bottom bottom",
         onUpdate: (self) => sceneState.set({ progress: self.progress }),
       });
 
       ScrollTrigger.create({
-        trigger: '.hero',
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => setSection('hero'),
-        onEnterBack: () => setSection('hero'),
+        trigger: ".hero",
+        start: "top center",
+        end: "bottom center",
+        onEnter: () => setSection("hero"),
+        onEnterBack: () => setSection("hero"),
       });
       ScrollTrigger.create({
-        trigger: '#about',
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => setSection('about'),
-        onEnterBack: () => setSection('about'),
+        trigger: "#about",
+        start: "top center",
+        end: "bottom center",
+        onEnter: () => setSection("about"),
+        onEnterBack: () => setSection("about"),
       });
       ScrollTrigger.create({
-        trigger: '#approach',
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => setSection('approach'),
-        onEnterBack: () => setSection('approach'),
+        trigger: "#experience",
+        start: "top center",
+        end: "bottom center",
+        onEnter: () => setSection("experience"),
+        onEnterBack: () => setSection("experience"),
       });
       ScrollTrigger.create({
-        trigger: '#now',
-        start: 'top center',
-        end: 'bottom bottom',
-        onEnter: () => setSection('contact'),
-        onEnterBack: () => setSection('contact'),
+        trigger: "#now",
+        start: "top center",
+        end: "bottom bottom",
+        onEnter: () => setSection("contact"),
+        onEnterBack: () => setSection("contact"),
       });
 
-      gsap.from('.hero .line', {
+      gsap.from(".hero .line", {
         yPercent: 110,
         duration: 1.15,
         stagger: 0.12,
-        ease: 'power4.out',
+        ease: "power4.out",
       });
-      gsap.from('.hero-copy, .hero-stack, .actions, .hero-hud, .scroll-cue, .eyebrow', {
-        opacity: 0,
-        y: 18,
-        duration: 0.9,
-        stagger: 0.08,
-        delay: 0.35,
-        ease: 'power3.out',
-      });
+      gsap.from(
+        ".hero-copy, .hero-stack, .actions, .hero-hud, .scroll-cue, .eyebrow",
+        {
+          opacity: 0,
+          y: 18,
+          duration: 0.9,
+          stagger: 0.08,
+          delay: 0.35,
+          ease: "power3.out",
+        },
+      );
 
-      gsap.utils.toArray<HTMLElement>('.section-title').forEach((title) => {
-        const lines = title.querySelectorAll('.line');
+      gsap.utils.toArray<HTMLElement>(".section-title").forEach((title) => {
+        const lines = title.querySelectorAll(".line");
         if (!lines.length) return;
         gsap.from(lines, {
           yPercent: 110,
           duration: 0.95,
           stagger: 0.08,
-          ease: 'power4.out',
-          scrollTrigger: { trigger: title, start: 'top 88%' },
+          ease: "power4.out",
+          scrollTrigger: { trigger: title, start: "top 88%" },
         });
       });
 
-      gsap.utils.toArray<HTMLElement>('.section-intro, .about-focus-item, .experience-item, .stack-item, .principle, .technology-card, .lifecycle-step').forEach((node, index) => {
-        gsap.from(node, {
-          opacity: 0,
-          y: 28,
-          duration: 0.85,
-          delay: (index % 4) * 0.05,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: node, start: 'top 88%' },
+      gsap.utils
+        .toArray<HTMLElement>(
+          ".section-intro, .about-cap-row, .experience-item, .stack-item, .principle, .technology-card, .lifecycle-step",
+        )
+        .forEach((node, index) => {
+          gsap.from(node, {
+            opacity: 0,
+            y: 28,
+            duration: 0.85,
+            delay: (index % 4) * 0.05,
+            ease: "power3.out",
+            scrollTrigger: { trigger: node, start: "top 88%" },
+          });
         });
-      });
 
       ScrollTrigger.create({
-        trigger: '#work',
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => setSection('work'),
-        onEnterBack: () => setSection('work'),
+        trigger: "#work",
+        start: "top center",
+        end: "bottom center",
+        onEnter: () => setSection("work"),
+        onEnterBack: () => setSection("work"),
       });
 
+      // ── Desktop: Horizontal scroll track with smooth centered rise ────────
       const mm = gsap.matchMedia();
-      mm.add('(min-width: 900px)', () => {
-        const track = document.querySelector('.work-track') as HTMLElement | null;
-        const pin = document.querySelector('.work-pin') as HTMLElement | null;
-        if (!track || !pin) return;
-        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 160);
-        gsap.to(track, {
-          x: () => -distance(),
-          ease: 'none',
+      mm.add("(min-width: 900px)", () => {
+        const pin = document.querySelector(".work-pin") as HTMLElement | null;
+        const track = document.querySelector(".work-track") as HTMLElement | null;
+        const cards = gsap.utils.toArray<HTMLElement>(".work-panel-magnet");
+        if (!pin || !track || cards.length < 2) return;
+
+        const steps = cards.length - 1;
+        const getStepDistance = () => {
+          const cardWidth = cards[0]?.offsetWidth || 700;
+          return cardWidth + 36; // card width + gap
+        };
+
+        // Initial state: Card 0 is centered & raised; remaining cards wait on the right
+        gsap.set(cards[0], { y: -14, scale: 1.0, opacity: 1.0 });
+        for (let i = 1; i < cards.length; i++) {
+          gsap.set(cards[i], { y: 0, scale: 0.92, opacity: 0.45 });
+        }
+
+        const timeline = gsap.timeline({
+          defaults: { ease: "none" },
           scrollTrigger: {
             trigger: pin,
-            start: 'top 88px',
-            end: () => `+=${distance()}`,
+            start: "top 88px",
+            end: () => `+=${Math.round(getStepDistance() * steps * 1.15)}`,
             pin: true,
-            scrub: 0.7,
+            scrub: 0.8,
             anticipatePin: 1,
-            onEnter: () => setSection('work'),
-            onEnterBack: () => setSection('work'),
+            invalidateOnRefresh: true,
+            id: "work-pinned-track",
+            onEnter: () => setSection("work"),
+            onEnterBack: () => setSection("work"),
             onUpdate: (self) => {
-              sceneState.set({
-                section: 'work',
-                workIndex: Math.min(
-                  projects.length - 1,
-                  Math.floor(self.progress * projects.length),
-                ),
+              const activeIdx = Math.min(
+                projects.length - 1,
+                Math.max(0, Math.round(self.progress * steps)),
+              );
+              sceneState.set({ section: "work", workIndex: activeIdx });
+              cards.forEach((c, idx) => {
+                const panel = c.querySelector(".work-panel");
+                if (panel) {
+                  if (idx === activeIdx) {
+                    panel.classList.add("is-active");
+                  } else {
+                    panel.classList.remove("is-active");
+                  }
+                }
               });
             },
           },
         });
+
+        // 1. Move the track horizontally so each card centers in turn
+        timeline.to(
+          track,
+          {
+            x: () => -getStepDistance() * steps,
+            ease: "none",
+            duration: steps,
+          },
+          0,
+        );
+
+        // 2. Scrub the progress fill line smoothly from 0 → 100%
+        const progressFill = document.getElementById("work-progress-fill");
+        if (progressFill) {
+          timeline.to(
+            progressFill,
+            { width: "100%", ease: "none", duration: steps },
+            0,
+          );
+        }
+
+        // 3. For each scroll step:
+        //    Current card lowers & dims as it leaves center
+        //    Next card glides in, centers, scales up & rises
+        for (let step = 0; step < steps; step++) {
+          const ease = "power2.inOut";
+          timeline.to(
+            cards[step],
+            { y: 0, scale: 0.92, opacity: 0.45, ease, duration: 1 },
+            step,
+          );
+          timeline.to(
+            cards[step + 1],
+            { y: -14, scale: 1.0, opacity: 1.0, ease, duration: 1 },
+            step,
+          );
+        }
+
+        return () => {
+          timeline.scrollTrigger?.kill();
+          timeline.kill();
+        };
       });
-      mm.add('(max-width: 899px)', () => {
-        const panels = gsap.utils.toArray<HTMLElement>('.work-panel');
+
+      // ── Mobile: IntersectionObserver for active card ──────────────────────
+      mm.add("(max-width: 899px)", () => {
+        const panels = gsap.utils.toArray<HTMLElement>(".work-panel");
         if (!panels.length) return;
         const observer = new IntersectionObserver(
           (entries) => {
@@ -276,11 +367,11 @@ export function Portfolio() {
               ? Number((visible.target as HTMLElement).dataset.workIndex ?? 0)
               : 0;
             sceneState.set({
-              section: 'work',
+              section: "work",
               workIndex: Math.min(projects.length - 1, Math.max(0, index)),
             });
           },
-          { rootMargin: '-30% 0px -40% 0px', threshold: [0.25, 0.5, 0.75] },
+          { rootMargin: "-30% 0px -40% 0px", threshold: [0.25, 0.5, 0.75] },
         );
         panels.forEach((panel) => observer.observe(panel));
         return () => observer.disconnect();
@@ -288,57 +379,39 @@ export function Portfolio() {
 
       ScrollTrigger.refresh();
     },
-    { scope: rootRef, dependencies: [ready, reducedMotion] },
+    { scope: rootRef, dependencies: [isReady, reducedMotion] },
   );
 
-  const onSelectTechnology = (technology: Technology) => {
-    setSelectedTechnology(technology);
-    sceneState.set({ techIndex: technologies.findIndex((item) => item.name === technology.name) });
-  };
-
-  const onSelectStage = (index: number) => {
-    setSelectedStage(index);
-    sceneState.set({ techIndex: index });
-  };
+  useEffect(() => {
+    if (!isReady || reducedMotion) return;
+    const hash = window.location.hash;
+    if (hash && hash.length > 1) {
+      const el = document.querySelector(hash);
+      if (el && lenisRef.current) {
+        const timer = setTimeout(() => {
+          lenisRef.current?.scrollTo(el as HTMLElement, { offset: -72, immediate: true });
+        }, 120);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isReady, reducedMotion]);
 
   return (
     <main className="portfolio-shell" id="site" ref={rootRef}>
-      {!reducedMotion && !ready && <Preloader onDone={onPreloaderDone} />}
+      {!reducedMotion && !isReady && <Preloader onDone={onPreloaderDone} />}
       {!reducedMotion && <Cursor />}
-      {!reducedMotion && (
-        <ErrorBoundary FallbackComponent={() => <SceneFallback />}>
-          <SceneCanvas />
-        </ErrorBoundary>
-      )}
       <div className="grain" aria-hidden="true" />
-      <InspectGrid ready={ready || reducedMotion} />
-      <Nav menuOpen={menuOpen} onToggle={() => setMenuOpen((open) => !open)} onClose={closeMenu} />
-      <Hero ready={ready || reducedMotion} />
+      <InspectGrid ready={isReady} />
+      <Nav
+        menuOpen={menuOpen}
+        onToggle={() => setMenuOpen((open) => !open)}
+        onClose={closeMenu}
+      />
+      <Hero ready={isReady} />
       <About />
       <Experience />
-      <Work
-        onOpenBrief={(project, origin) => {
-          setBriefOrigin(origin);
-          setSelectedProject(project);
-        }}
-      />
-      <Approach
-        selectedTechnology={selectedTechnology}
-        selectedStage={selectedStage}
-        onSelectTechnology={onSelectTechnology}
-        onSelectStage={onSelectStage}
-      />
+      <Work />
       <Contact />
-      {selectedProject && (
-        <BriefDialog
-          project={selectedProject}
-          origin={briefOrigin}
-          onClose={() => {
-            setSelectedProject(null);
-            setBriefOrigin(null);
-          }}
-        />
-      )}
     </main>
   );
 }
