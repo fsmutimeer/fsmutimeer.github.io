@@ -115,6 +115,19 @@ export function Contact() {
 
       <div className="container">
         <footer>
+          <nav className="footer-nav" aria-label="Page navigation">
+            {[
+              { label: "Home", href: "#hero" },
+              { label: "About", href: "#about" },
+              { label: "Experience", href: "#experience" },
+              { label: "Work", href: "#work" },
+            ].map(({ label, href }) => (
+              <a key={href} className="footer-nav-link" href={href}>
+                {label}
+              </a>
+            ))}
+          </nav>
+
           <div className="footer-dock-wrap">
             <nav className="footer-dock" aria-label="Social and professional links dock">
               <Magnetic strength={0.15}>

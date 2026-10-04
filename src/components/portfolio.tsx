@@ -198,7 +198,7 @@ export function Portfolio() {
       });
       ScrollTrigger.create({
         trigger: "#now",
-        start: "top center",
+        start: "top 85%",
         end: "bottom bottom",
         onEnter: () => setSection("contact"),
         onEnterBack: () => setSection("contact"),
@@ -290,12 +290,18 @@ export function Portfolio() {
             id: "work-pinned-track",
             onEnter: () => setSection("work"),
             onEnterBack: () => setSection("work"),
+            onLeave: () => setSection("contact"),
+            onLeaveBack: () => setSection("experience"),
             onUpdate: (self) => {
               const activeIdx = Math.min(
                 projects.length - 1,
                 Math.max(0, Math.round(self.progress * steps)),
               );
-              sceneState.set({ section: "work", workIndex: activeIdx });
+              if (self.isActive) {
+                sceneState.set({ section: "work", workIndex: activeIdx });
+              } else {
+                sceneState.set({ workIndex: activeIdx });
+              }
               cards.forEach((c, idx) => {
                 const panel = c.querySelector(".work-panel");
                 if (panel) {
@@ -321,17 +327,9 @@ export function Portfolio() {
           0,
         );
 
-        // 2. Scrub the progress fill line smoothly from 0 → 100%
-        const progressFill = document.getElementById("work-progress-fill");
-        if (progressFill) {
-          timeline.to(
-            progressFill,
-            { width: "100%", ease: "none", duration: steps },
-            0,
-          );
-        }
 
-        // 3. For each scroll step:
+        // 2. For each scroll step:
+
         //    Current card lowers & dims as it leaves center
         //    Next card glides in, centers, scales up & rises
         for (let step = 0; step < steps; step++) {

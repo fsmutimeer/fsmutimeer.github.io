@@ -246,12 +246,7 @@ export function Work() {
           </div>
         </div>
 
-        {/* ── Scroll‑progress strip (sleek line without label numbers) ── */}
-        <div className="work-progress-strip" aria-hidden="true">
-          <div className="work-progress-rail">
-            <div className="work-progress-fill" id="work-progress-fill" />
-          </div>
-        </div>
+
 
       </div>
     </section>

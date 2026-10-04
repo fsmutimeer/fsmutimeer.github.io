@@ -100,13 +100,21 @@ export function Nav({
       return;
     }
     const updateActiveSection = () => {
-      const focalY = 160;
+      // If at or near bottom of page, always activate contact ("now" -> 04 / 04)
+      const scrollBottom = window.innerHeight + window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      if (scrollBottom >= docHeight - 90) {
+        setActiveId("now");
+        return;
+      }
+
+      const focalY = window.innerHeight * 0.4;
       for (let i = sections.length - 1; i >= 0; i--) {
         const id = sections[i].id;
         const el = document.getElementById(id);
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.top <= focalY && rect.bottom > focalY) {
+          if (rect.top <= focalY && rect.bottom > 80) {
             setActiveId(id);
             return;
           }

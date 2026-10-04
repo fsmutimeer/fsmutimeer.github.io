@@ -929,33 +929,7 @@ h1, .section-title, .contact-email, .preloader-count {
   overflow: hidden;
 }
 
-/* ── Scroll progress strip ── */
-.work-progress-strip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding-top: 10px;
-  flex-shrink: 0;
-}
-.work-progress-rail {
-  position: relative;
-  width: min(740px, calc(100% - 48px));
-  height: 2px;
-  background: rgb(200 243 106 / 10%);
-  border-radius: 1px;
-  overflow: hidden;
-}
-.work-progress-fill {
-  position: absolute;
-  top: 0; left: 0;
-  width: 0%;
-  height: 100%;
-  background: var(--acid);
-  border-radius: 1px;
-  will-change: width;
-  box-shadow: 0 0 8px rgb(200 243 106 / 60%);
-}
+
 
 .work-panel-head {
   display: flex;
@@ -1325,16 +1299,15 @@ h1, .section-title, .contact-email, .preloader-count {
   align-items: flex-start;
   justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 48px;
-  padding-top: 25px;
-  border-top: 1px solid rgb(200 243 106 / 18%);
+  gap: 32px;
+  padding-top: 0;
 }
 .contact-emails-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
-.contact-label { margin-bottom: 14px; }
+.contact-label { margin-bottom: 10px; }
 .contact-email {
   display: inline-flex;
   align-items: baseline;
@@ -1363,8 +1336,26 @@ h1, .section-title, .contact-email, .preloader-count {
 
 footer {
   min-width: 0;
-  margin-top: 64px;
+  margin-top: 48px;
 }
+
+/* Footer Navigation */
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 36px;
+  margin-bottom: 28px;
+}
+.footer-nav-link {
+  font: 11px var(--app-font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.footer-nav-link:hover { color: var(--acid); }
 
 /* Footer Dock */
 .footer-dock-wrap {
@@ -1730,8 +1721,8 @@ footer {
     transform: none !important;
   }
   .work-panel { min-height: 380px; height: auto; max-height: none; }
-  .work-progress-strip { display: none; }
 }
+
 @media (max-width: 899px) {
   .work-stage { overflow: visible; }
   .work-track { display: block; padding: 0; }
