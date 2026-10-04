@@ -76,14 +76,7 @@ export function Work() {
         <div className="container work-head">
           <div>
             <div className="section-label mono">03 / selected work</div>
-            <SplitTitle id="work-heading" lines={["Four pieces", "of work."]} />
-          </div>
-          <div className="work-head-right">
-            <p className="section-intro">
-              Three connected pieces of backend and platform work: services,
-              on-prem clusters, and GitOps delivery. The fourth is my public
-              Quarkus configuration tool. Proprietary details remain private.
-            </p>
+            <SplitTitle id="work-heading" lines={["Work and", "open source projects."]} />
           </div>
         </div>
 

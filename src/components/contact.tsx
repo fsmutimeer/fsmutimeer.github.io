@@ -67,7 +67,7 @@ export function Contact() {
           </div>
         </div>
         <div className="contact" id="contact">
-          <div>
+          <div className="contact-col">
             <div className="mono section-label contact-label">email</div>
             <div className="contact-emails-list">
               {profile.emails.map((email) => (
@@ -91,6 +91,25 @@ export function Contact() {
             </div>
           </div>
 
+          <div className="contact-col">
+            <div className="mono section-label contact-label">phone</div>
+            <Magnetic strength={0.12}>
+              <a
+                className="contact-email"
+                href="tel:+923337022773"
+                data-testid="link-phone-contact"
+                data-cursor="hover"
+                data-cursor-label="call"
+              >
+                +92 333 7022773{" "}
+                <ExternalLink
+                  size={17}
+                  style={{ verticalAlign: "-2px", color: "var(--acid)" }}
+                  aria-hidden="true"
+                />
+              </a>
+            </Magnetic>
+          </div>
         </div>
       </div>
 

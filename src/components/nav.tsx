@@ -79,24 +79,43 @@ export function Nav({
   useModalFocus(dialogRef, menuOpen, onClose);
 
   useEffect(() => {
-    setActiveId(isHomePage ? "top" : "about");
-    const nodes = sections
-      .map(({ id }) => document.getElementById(id))
-      .filter((node): node is HTMLElement => Boolean(node));
-    if (!nodes.length) return;
+    return sceneState.subscribe((snapshot) => {
+      const sectionMap: Record<SceneSection, string> = {
+        hero: "top",
+        about: "about",
+        experience: "experience",
+        work: "work",
+        approach: "work",
+        contact: "now",
+      };
+      if (snapshot.section && sectionMap[snapshot.section]) {
+        setActiveId(sectionMap[snapshot.section]);
+      }
+    });
+  }, []);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setActiveId(visible.target.id);
-      },
-      { rootMargin: "-28% 0px -55% 0px", threshold: [0.1, 0.35, 0.6] },
-    );
-
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+  useEffect(() => {
+    if (!isHomePage) {
+      setActiveId("about");
+      return;
+    }
+    const updateActiveSection = () => {
+      const focalY = 160;
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const id = sections[i].id;
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= focalY && rect.bottom > focalY) {
+            setActiveId(id);
+            return;
+          }
+        }
+      }
+    };
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    return () => window.removeEventListener("scroll", updateActiveSection);
   }, [isHomePage]);
 
   useEffect(() => {
