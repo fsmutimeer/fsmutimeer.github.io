@@ -236,7 +236,7 @@ export function Portfolio() {
 
       gsap.utils
         .toArray<HTMLElement>(
-          ".section-intro, .about-cap-row, .experience-item, .stack-item, .principle, .technology-card, .lifecycle-step",
+          ".section-intro, .about-cap-row, .experience-item",
         )
         .forEach((node, index) => {
           gsap.from(node, {
@@ -266,15 +266,13 @@ export function Portfolio() {
         if (!pin || !track || cards.length < 2) return;
 
         const steps = cards.length - 1;
-        const getStepDistance = () => {
-          const cardWidth = cards[0]?.offsetWidth || 700;
-          return cardWidth + 36; // card width + gap
-        };
+        const getStepDistance = () => window.innerHeight * 0.9;
+        const rise = 90;
 
-        // Initial state: Card 0 is centered & raised; remaining cards wait on the right
-        gsap.set(cards[0], { y: -14, scale: 1.0, opacity: 1.0 });
+        // Initial state: card 0 centred; the rest wait below, transparent
+        gsap.set(cards[0], { y: 0, scale: 1, opacity: 1 });
         for (let i = 1; i < cards.length; i++) {
-          gsap.set(cards[i], { y: 0, scale: 0.92, opacity: 0.45 });
+          gsap.set(cards[i], { y: rise, scale: 0.97, opacity: 0 });
         }
 
         const timeline = gsap.timeline({
@@ -285,7 +283,6 @@ export function Portfolio() {
             end: () => `+=${Math.round(getStepDistance() * steps * 1.15)}`,
             pin: true,
             scrub: 0.8,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
             id: "work-pinned-track",
             onEnter: () => setSection("work"),
@@ -316,35 +313,22 @@ export function Portfolio() {
           },
         });
 
-        // 1. Move the track horizontally so each card centers in turn
-        timeline.to(
-          track,
-          {
-            x: () => -getStepDistance() * steps,
-            ease: "none",
-            duration: steps,
-          },
-          0,
-        );
-
-
-        // 2. For each scroll step:
-
-        //    Current card lowers & dims as it leaves center
-        //    Next card glides in, centers, scales up & rises
+        // Each step: hold, current card fades away upward, then the next rises in.
+        // Tweens span [step + 0.15, step + 0.85] so each card rests at integer progress.
         for (let step = 0; step < steps; step++) {
-          const ease = "power2.inOut";
           timeline.to(
             cards[step],
-            { y: 0, scale: 0.92, opacity: 0.45, ease, duration: 1 },
-            step,
+            { y: -rise, scale: 0.97, opacity: 0, ease: "power2.in", duration: 0.4 },
+            step + 0.15,
           );
           timeline.to(
             cards[step + 1],
-            { y: -14, scale: 1.0, opacity: 1.0, ease, duration: 1 },
-            step,
+            { y: 0, scale: 1, opacity: 1, ease: "power2.out", duration: 0.4 },
+            step + 0.45,
           );
         }
+        // Pad the timeline so its duration equals `steps` (progress = index / steps)
+        timeline.set({}, {}, steps);
 
         return () => {
           timeline.scrollTrigger?.kill();

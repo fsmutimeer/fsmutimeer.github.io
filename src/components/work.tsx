@@ -1,22 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Github } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { projects } from "@/lib/content";
 import { withBasePath } from "@/lib/base-path";
 import { sceneState } from "@/lib/scene-state";
-import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 import { SplitTitle } from "./split-title";
 import { WorkDiagram } from "./work-diagram";
 
 export function Work() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [pinnedIndex, setPinnedIndex] = useState(0);
-  const charAnimRef = useRef<gsap.core.Tween | null>(null);
-  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(
     () =>
@@ -25,30 +22,6 @@ export function Work() {
       }),
     [],
   );
-
-  /* ── Staggered title char morph on active card change ── */
-  useEffect(() => {
-    if (reducedMotion) return;
-    const el = document.querySelector<HTMLElement>(
-      `[data-work-index="${pinnedIndex}"]`,
-    );
-    if (!el) return;
-    const chars = el.querySelectorAll<HTMLElement>(".work-title-char");
-    if (!chars.length) return;
-    charAnimRef.current?.kill();
-    charAnimRef.current = gsap.fromTo(
-      chars,
-      { opacity: 0, y: 10 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.45,
-        stagger: 0.022,
-        ease: "power3.out",
-        clearProps: "transform,opacity",
-      },
-    );
-  }, [pinnedIndex, reducedMotion]);
 
   const goToCard = (index: number) => {
     const clamped = Math.max(0, Math.min(projects.length - 1, index));
@@ -104,13 +77,23 @@ export function Work() {
                   data-testid={`card-project-${project.number}`}
                   data-work-index={index}
                   data-cursor="hover"
-                  data-cursor-label={pinnedIndex === index ? "inspect" : "view"}
+                  data-cursor-label={pinnedIndex === index ? "open" : "view"}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).closest("a, button")) return;
                     if (pinnedIndex !== index) goToCard(index);
                   }}
                   onPointerEnter={(event) => {
                     if (event.pointerType !== "touch") setHovered(index);
+                  }}
+                  onPointerMove={(event) => {
+                    if (event.pointerType === "touch") return;
+                    const el = event.currentTarget;
+                    const rect = el.getBoundingClientRect();
+                    // Normalise for GSAP scale so the glow tracks the cursor exactly.
+                    const sx = el.offsetWidth / rect.width || 1;
+                    const sy = el.offsetHeight / rect.height || 1;
+                    el.style.setProperty("--mx", `${(event.clientX - rect.left) * sx}px`);
+                    el.style.setProperty("--my", `${(event.clientY - rect.top) * sy}px`);
                   }}
                   onPointerLeave={(event) => {
                     if (!event.currentTarget.matches(":focus-within")) setHovered(null);
@@ -123,131 +106,124 @@ export function Work() {
                     }
                   }}
                 >
-                  {/* ── Terminal top bar ── */}
-                  <div className="work-panel-terminal" aria-hidden="true">
-                    <div className="terminal-dots">
-                      <span className="terminal-dot td-red" />
-                      <span className="terminal-dot td-yellow" />
-                      <span className="terminal-dot td-green" />
-                    </div>
-                    <span className="terminal-label mono">
-                      {project.number} — {project.scope}
-                    </span>
-                    <span className={`terminal-status mono${pinnedIndex === index ? " is-live" : ""}`}>
-                      {pinnedIndex === index ? "● active" : "○ standby"}
-                    </span>
-                  </div>
+                  <span className="work-card-glow" aria-hidden="true" />
+                  <span className="work-card-spot" aria-hidden="true" />
 
-                  {/* ── Split‑panel content body ── */}
-                  <div className="work-panel-body">
-                    <div className="work-panel-main">
-                      <div className="work-panel-copy">
-                        <div className="work-panel-head">
-                          <span className="work-panel-no mono">{project.number}</span>
-                          <span className="project-sub mono">{project.scope}</span>
-                        </div>
-
-                        {/* Title with individual char spans for morph animation */}
-                        <h3 className="work-panel-title" aria-label={project.title}>
-                          {project.title.split("").map((char, ci) => (
-                            <span
-                              key={ci}
-                              className="work-title-char"
-                              aria-hidden="true"
-                            >
-                              {char === " " ? "\u00a0" : char}
-                            </span>
-                          ))}
-                        </h3>
-
-                        <p data-testid={`text-project-copy-${project.number}`}>
-                          {project.copy}
-                        </p>
-                      </div>
-
-                      <div className="work-panel-visual" aria-hidden="true">
-                        <WorkDiagram
-                          number={project.number}
-                          active={
-                            hovered === index ||
-                            (hovered === null && pinnedIndex === index)
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div className="work-panel-footer">
-                      <div className="tags" aria-label={`Tech stack for ${project.title}`}>
-                        {project.tags.map((tag) => (
-                          <span className="tag mono" key={tag}>
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      {project.metrics && project.metrics.length > 0 && (
-                        <div
-                          className="work-metrics"
-                          aria-label={`Impact metrics for ${project.title}`}
+                  <div className="work-card-main">
+                    <div className="work-card-copy">
+                      <h3 className="work-card-title">{project.title}</h3>
+                      <p
+                        className="work-card-desc"
+                        data-testid={`text-project-copy-${project.number}`}
+                      >
+                        {project.copy}
+                      </p>
+                      {project.metrics.length > 0 && (
+                        <ul
+                          className="work-card-highlights"
+                          aria-label={`Highlights for ${project.title}`}
                         >
                           {project.metrics.map((metric) => (
-                            <span className="work-metric mono" key={metric}>
+                            <li key={metric}>
+                              <Check size={13} aria-hidden="true" />
                               {metric}
-                            </span>
+                            </li>
                           ))}
-                        </div>
+                        </ul>
                       )}
+                    </div>
 
-                      <div className="work-panel-actions">
-                        {project.slug && (
-                          <Link
-                            className="work-case-link"
-                            href={withBasePath(`/work/${project.slug}`)}
-                            data-testid={`link-case-study-${project.number}`}
-                            data-cursor="hover"
-                            data-cursor-label="case study"
-                          >
-                            Read the case study <ArrowUpRight size={14} aria-hidden="true" />
-                          </Link>
-                        )}
-                        {project.href && (
-                          <a
-                            className="text-link"
-                            href={project.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            data-testid={`link-project-documentation-${project.number}`}
-                            data-cursor="hover"
-                            data-cursor-label="docs"
-                          >
-                            {project.hrefLabel ?? "Documentation"} <ArrowUpRight size={12} aria-hidden="true" />
-                          </a>
-                        )}
-                        {project.repoUrl && (
-                          <a
-                            className="text-link work-source-link"
-                            href={project.repoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            data-testid={`link-project-repository-${project.number}`}
-                            data-cursor="hover"
-                            data-cursor-label="source"
-                          >
-                            <Github size={14} aria-hidden="true" /> GitHub
-                            <ArrowUpRight size={12} aria-hidden="true" />
-                          </a>
-                        )}
-                      </div>
+                    <div className="work-card-visual" aria-hidden="true">
+                      <WorkDiagram
+                        slug={project.slug}
+                        active={
+                          hovered === index ||
+                          (hovered === null && pinnedIndex === index)
+                        }
+                      />
                     </div>
                   </div>
+
+                  <footer className="work-card-foot">
+                    <ul className="work-card-tags" aria-label={`Tech stack for ${project.title}`}>
+                      {project.tags.map((tag) => (
+                        <li className="work-card-tag mono" key={tag}>
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="work-card-actions">
+                      <Link
+                        className="work-card-cta"
+                        href={withBasePath(`/work/${project.slug}/`)}
+                        data-testid={`link-case-study-${project.number}`}
+                        data-cursor="hover"
+                        data-cursor-label="case study"
+                      >
+                        Case study <ArrowUpRight size={14} aria-hidden="true" />
+                      </Link>
+                      {project.href && (
+                        <a
+                          className="work-card-link"
+                          href={project.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-testid={`link-project-documentation-${project.number}`}
+                          data-cursor="hover"
+                          data-cursor-label="docs"
+                        >
+                          {project.hrefLabel ?? "Docs"} <ArrowUpRight size={12} aria-hidden="true" />
+                        </a>
+                      )}
+                      {project.repoUrl && (
+                        <a
+                          className="work-card-link"
+                          href={project.repoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${project.title} on GitHub`}
+                          data-testid={`link-project-repository-${project.number}`}
+                          data-cursor="hover"
+                          data-cursor-label="source"
+                        >
+                          <FaGithub size={14} aria-hidden="true" /> GitHub
+                        </a>
+                      )}
+                    </div>
+                  </footer>
                 </article>
               </div>
             ))}
           </div>
         </div>
 
-
-
+        {/* ── Track position + prev/next (desktop pinned track only) ── */}
+        <div className="container work-controls" aria-label="Selected work navigation">
+          <div className="work-arrows">
+            <button
+              type="button"
+              className="work-arrow"
+              onClick={() => goToCard(pinnedIndex - 1)}
+              disabled={pinnedIndex === 0}
+              aria-label="Previous project"
+              data-cursor="hover"
+              data-cursor-label="prev"
+            >
+              <ArrowLeft size={16} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="work-arrow"
+              onClick={() => goToCard(pinnedIndex + 1)}
+              disabled={pinnedIndex === projects.length - 1}
+              aria-label="Next project"
+              data-cursor="hover"
+              data-cursor-label="next"
+            >
+              <ArrowRight size={16} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

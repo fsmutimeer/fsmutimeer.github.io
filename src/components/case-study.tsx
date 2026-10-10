@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
-import { doctorRules, type Project } from '@/lib/content';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check } from 'lucide-react';
+import { doctorRules, projects, type Project } from '@/lib/content';
 import { profile } from '@/lib/profile';
 import { withBasePath } from '@/lib/base-path';
 import { CaseStudyFigure } from './case-study-figure';
@@ -12,8 +12,7 @@ import { Nav } from './nav';
 import { Cursor } from './cursor';
 
 const captions: Record<string, string> = {
-  'quarkus-kafka': 'Decoupled event pipeline: Kafka between microservices, Keycloak for identity & RBAC.',
-  'openshift-okd': 'High-availability on-premise OpenShift and OKD Kubernetes cluster topology on KVM.',
+  migrax: 'JPA entities → generated SQL with rollback → lint, verify, migrate, and drift checks.',
   'gitops-tekton': 'Git → Tekton CI + Trivy scanning → Argo CD GitOps delivery on OpenShift.',
   'quarkus-doctor': 'Static analysis tool: validates Quarkus configuration against Kubernetes manifests.',
 };
@@ -22,6 +21,12 @@ export function CaseStudy({ project }: { project: Project }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { caseStudy } = project;
   const homeWork = withBasePath('/#work');
+  const index = projects.findIndex((p) => p.slug === project.slug);
+  const prev = index > 0 ? projects[index - 1] : undefined;
+  const next = index < projects.length - 1 ? projects[index + 1] : undefined;
+  const pathSteps = caseStudy.path.includes('→')
+    ? caseStudy.path.split('→').map((step) => step.trim()).filter(Boolean)
+    : null;
 
   return (
     <main className="portfolio-shell study-page">
@@ -66,16 +71,17 @@ export function CaseStudy({ project }: { project: Project }) {
               </span>
             ))}
           </div>
-          <div className="work-metrics">
+          <ul className="work-card-highlights study-highlights">
             {project.metrics.map((metric) => (
-              <div className="metric mono" key={metric}>
+              <li key={metric}>
+                <Check size={13} aria-hidden="true" />
                 {metric}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
 
           <div className="study-diagram-row" aria-hidden="true">
-            <WorkDiagram number={project.number} active />
+            <WorkDiagram slug={project.slug} active />
           </div>
 
           {caseStudy.proprietary && (
@@ -94,7 +100,18 @@ export function CaseStudy({ project }: { project: Project }) {
           </section>
           <section className="study-block">
             <h2>Path</h2>
-            <p>{caseStudy.path}</p>
+            {pathSteps ? (
+              <ol className="study-path">
+                {pathSteps.map((step, i) => (
+                  <li key={step}>
+                    <span className="study-path-no mono">{String(i + 1).padStart(2, '0')}</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p>{caseStudy.path}</p>
+            )}
           </section>
 
           <CaseStudyFigure slug={project.slug} caption={captions[project.slug] ?? project.outcome} />
@@ -155,6 +172,37 @@ export function CaseStudy({ project }: { project: Project }) {
               ))}
             </ul>
           </section>
+          {caseStudy.retrospective && (
+            <section className="study-block">
+              <h2>What I&apos;d change</h2>
+              <p>{caseStudy.retrospective}</p>
+            </section>
+          )}
+
+          <nav className="study-pager" aria-label="More case studies">
+            {prev ? (
+              <Link
+                className="study-pager-link"
+                href={withBasePath(`/work/${prev.slug}/`)}
+                data-cursor="hover"
+                data-cursor-label="prev"
+              >
+                <span className="mono"><ArrowLeft size={12} aria-hidden="true" /> Previous</span>
+                <strong>{prev.title}</strong>
+              </Link>
+            ) : <span />}
+            {next ? (
+              <Link
+                className="study-pager-link is-next"
+                href={withBasePath(`/work/${next.slug}/`)}
+                data-cursor="hover"
+                data-cursor-label="next"
+              >
+                <span className="mono">Next <ArrowRight size={12} aria-hidden="true" /></span>
+                <strong>{next.title}</strong>
+              </Link>
+            ) : <span />}
+          </nav>
 
           <div className="study-footer">
             <Link className="button" href={homeWork} data-cursor="hover" data-cursor-label="work">

@@ -134,13 +134,9 @@ export function Experience() {
             <div className="section-label mono">02 / experience</div>
             <SplitTitle
               id="experience-heading"
-              lines={["A career", "in systems."]}
+              lines={["Shipping to", "production since 2021."]}
             />
           </div>
-          <p className="section-intro">
-            From Node.js backends to Java services, integrations, and platform
-            delivery.
-          </p>
         </div>
         <ol className="experience-list" data-testid="list-experience">
           {experience.map((job) => (

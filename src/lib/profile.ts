@@ -23,15 +23,22 @@ export const profile = {
   instagramUrl: 'https://instagram.com/fsmutimeer',
   hero: {
     eyebrow: 'backend & platform engineer',
+    headline: 'I build the backends that power AI-ready products.',
     copy:
-      'I build Java and Quarkus backend services, event-driven integrations, and cloud-native Kubernetes platforms.',
+      'Software engineer building cloud-native Java and Quarkus services, Kafka event-driven integrations, and the Kubernetes / OpenShift platforms they run on.',
     stack: 'Java · Quarkus · Kafka · Kubernetes · OpenShift · GitOps',
+    // Background portrait on the right of the landing page, cropped to the face.
+    // To replace it: drop a new file into public/images/, point `image` at it, and set
+    // `face` to where the face sits in that image, as fractions of its width/height
+    // (x = centre of the face, top = top of the hair, height = hair-to-chin).
+    image: '/images/hero.png',
+    face: { x: 0.49, top: 0.11, height: 0.29 },
   },
   about: {
-    headline: 'From Kalash to the Cluster.',
+    headline: ['Backend engineer,', 'platform owner.'],
     summary: [
-      'Growing up in the remote mountain valleys of Kalash, my path evolved from self-taught programming to designing distributed enterprise systems.',
-      'Today I engineer at the intersection of backend architecture and cloud platforms—building decoupled Quarkus services and resilient Kubernetes environments.',
+      'I build Java and Quarkus microservices and help run the OpenShift clusters they ship to, from Kafka integrations to GitOps delivery.',
+      'Self-taught, my path started in the mountain valleys of Kalash and led to distributed enterprise systems.',
     ],
     education: 'M.Sc Information Technology · Quaid-i-Azam University · 2017–2019',
     capabilities: [

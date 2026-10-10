@@ -10,8 +10,6 @@ const headings = [
   '#about-heading',
   '#experience-heading',
   '#work-heading',
-  '#approach-heading',
-  '#platform-heading',
   '#now-heading',
 ] as const;
 

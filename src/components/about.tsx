@@ -37,7 +37,7 @@ export function About() {
               <div className="about-narrative">
                 <SplitTitle
                   id="about-heading"
-                  lines={["From Kalash to", "the Cluster."]}
+                  lines={profile.about.headline}
                 />
                 {profile.about.summary.map((paragraph) => (
                   <p className="about-narrative-p" key={paragraph.slice(0, 48)}>
@@ -55,7 +55,7 @@ export function About() {
                     data-cursor="hover"
                     data-cursor-label="story"
                   >
-                    The longer story →
+                    From Kalash to the cluster: the longer story →
                   </Link>
                 </p>
               </div>

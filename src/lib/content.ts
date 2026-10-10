@@ -1,18 +1,3 @@
-import {
-  Braces,
-  Cloud,
-  Container,
-  Cpu,
-  GitBranch,
-  Network,
-  Radio,
-  Rocket,
-  ShieldCheck,
-  type LucideIcon,
-} from 'lucide-react';
-import { SiApachekafka, SiKubernetes, SiQuarkus, SiRedhatopenshift } from 'react-icons/si';
-import type { IconType } from 'react-icons';
-
 export type CaseStudyDecision = {
   title: string;
   copy: string;
@@ -25,6 +10,8 @@ export type CaseStudy = {
   constraints: string[];
   decisions: CaseStudyDecision[];
   limits: string[];
+  /** Optional "What I'd change" note, shown on the case-study page when set. */
+  retrospective?: string;
   proprietary?: boolean;
 };
 
@@ -32,6 +19,8 @@ export type Project = {
   number: string;
   slug: string;
   scope: string;
+  /** Short badge on the card, e.g. license/version or "Production · private". */
+  status?: string;
   title: string;
   subtitle: string;
   copy: string;
@@ -59,141 +48,61 @@ export type ExperienceRole = {
 export const projects: Project[] = [
   {
     number: '01',
-    slug: 'quarkus-kafka',
-    scope: 'Backend services',
-    title: 'Quarkus microservices with Kafka and Keycloak',
-    subtitle: 'Quarkus · Camel · Kafka',
-    copy: 'Backend architecture for Quarkus microservices connected through Apache Camel and Kafka, with Keycloak for access control.',
-    metrics: ['Event-driven services', 'Kafka event path'],
-    tags: ['Quarkus', 'Apache Camel', 'Kafka', 'Keycloak', 'Event-Driven'],
+    slug: 'migrax',
+    scope: 'Open source · Java CLI',
+    status: 'MIT · v0.1.3',
+    title: 'Migrax',
+    subtitle: 'migrax · CLI · Maven / Gradle plugin',
+    copy: 'Generates SQL migrations from JPA entities, then lints them for table locks and data-loss risks before they reach production.',
+    metrics: ['Hibernate 5.4 – 7.4 · 6 databases', 'SQL + rollback · drift detection'],
+    tags: ['Java 17', 'Hibernate', 'JPA', 'SQL', 'Maven', 'Gradle'],
     detail:
-      'Backend engineering for Quarkus microservices. Apache Camel and Kafka handle event distribution between independent domain services. Keycloak provides centralized role-based access control. Downstream notification, relay, and messaging services consume from the event backbone.',
-    outcome: 'Decoupled service communication through event contracts rather than direct HTTP dependencies.',
-    role: 'Software engineer · Backend · Jan 2023–present',
+      'Migrax reads JPA entities, compares them with the database, and writes plain SQL migrations with a rollback script. It covers tables, columns, keys, indexes, join tables, element collections, sequences, and inheritance the way Hibernate maps them. lint flags statements that lock large tables, fail on existing rows, or break running instances; verify checks the result against your Hibernate version and rolls the migration back and forward; drift compares the live database with what the migrations produce. Works with Spring Boot, Quarkus, Micronaut, Helidon, Jakarta EE, and plain Hibernate on PostgreSQL, MySQL 8, MariaDB, SQL Server, Oracle 12c+, and H2.',
+    outcome: 'Schema changes ship as reviewable SQL with a tested rollback instead of hand-written scripts.',
+    role: 'Author · open source',
+    href: 'https://docs-migrax.github.io/',
+    hrefLabel: 'Documentation',
+    repoUrl: 'https://github.com/fsmutimeer/migrax',
     caseStudy: {
-      proprietary: true,
       problem:
-        'Synchronous inter-service coupling causes cascading failures and tight deployment interdependencies across domain boundaries.',
+        'Entities change in Java, but the migration that changes the database is still written by hand. A hand-written ALTER can lock a large table, fail on existing rows, or break instances still running the old code — and that usually shows up in production, not review.',
       design:
-        'Quarkus microservices with Apache Camel and Apache Kafka orchestrating asynchronous domain events. Centralized Keycloak RBAC handles authorization across services. Core and downstream consumers operate on a shared event backbone.',
-      path:
-        'Domain services emit business events to Kafka topics. Downstream services (notification, integration relay, email) independently consume and process events according to explicit contracts.',
+        'Migrax is a Java 17+ tool that reads JPA entities, compares them with the database, and writes plain SQL plus a rollback script. Each supported Hibernate version (5.4 to 7.4) reads its own mapping, so tables, keys, indexes, join tables, element collections, sequences, and inheritance match what Hibernate expects. No configuration files: it compiles the project, finds dependencies, and reads database settings from the application config.',
+      path: 'Change JPA entities → migrax generate → Review SQL + rollback → migrax verify → migrax migrate',
       constraints: [
-        'Production configuration details, customer data, and specific topic names are omitted.',
+        'Early release (0.1.x), MIT licensed.',
+        'Requires Java 17+.',
+        'Supports PostgreSQL, MySQL 8, MariaDB, SQL Server, Oracle 12c+, and H2.',
       ],
       decisions: [
         {
-          title: 'Asynchronous events over direct RPC',
-          copy: 'Kafka event streams keep domain communication decoupled, auditable, and replayable.',
+          title: 'Plain SQL, not a black box',
+          copy: 'Every migration is SQL you can read and edit before it runs, with a rollback script next to it.',
         },
         {
-          title: 'Camel for integration workflows',
-          copy: 'Integration flows exist as declarative contracts, allowing new consumers to subscribe without modifying producers.',
+          title: 'Lint before it ships',
+          copy: 'Statements that lock large tables, fail on existing rows, or break running instances are flagged before the migration reaches production.',
         },
         {
-          title: 'Centralized Keycloak RBAC',
-          copy: 'Dynamic role-based access control managed centrally rather than reimplemented inside individual services.',
+          title: 'Destructive changes are opt-in',
+          copy: 'When a dropped column looks like a rename, Migrax asks and renames it to keep the data. Drops only happen with --allow-destructive.',
         },
       ],
       limits: [
-        'Event-driven architectures introduce operational overhead (broker maintenance, schema evolution) in exchange for decoupling and resilience.',
+        'Lint flags known risk patterns; a clean lint is not a guarantee that a migration is safe on every dataset.',
+        'verify proves the rollback works against your Hibernate version — it does not replace testing with production-sized data.',
       ],
     },
   },
   {
     number: '02',
-    slug: 'openshift-okd',
-    scope: 'On-prem platforms',
-    title: 'OpenShift and OKD on premises',
-    subtitle: 'OpenShift / OKD · on-prem KVM',
-    copy: 'Architected and deployed enterprise OpenShift and OKD Kubernetes clusters on on-premise KVM infrastructure.',
-    metrics: ['Enterprise clusters', 'High-availability control planes'],
-    tags: ['OpenShift', 'OKD', 'KVM', 'Kubernetes'],
-    detail:
-      'Provisioned enterprise Red Hat OpenShift and OKD container platforms on on-premise KVM virtualization. Implemented automated installation, control-plane high availability, software-defined networking, and platform storage.',
-    outcome: 'Production-ready on-premise container platforms with enterprise reliability.',
-    role: 'Software engineer · Platform · Jan 2023–present',
-    caseStudy: {
-      proprietary: true,
-      problem:
-        'Enterprise microservices required a reliable on-premise container platform with automated ingress, RBAC, high availability, and operational visibility.',
-      design:
-        'Engineered high-availability Red Hat OpenShift and OKD container platforms on KVM infrastructure. Automated cluster provisioning via Assisted Installer, established multi-node control planes, and configured platform monitoring and storage.',
-      path:
-        'Base virtualization provisioning, automated installer execution, control-plane orchestration, worker pool allocation, and GitOps pipeline integration.',
-      constraints: [
-        'Hostnames, IP ranges, and internal capacity metrics are omitted.',
-      ],
-      decisions: [
-        {
-          title: 'Automated bare-metal/KVM installation',
-          copy: 'Streamlined cluster bootstrapping using automated installation workflows for consistent, reproducible node provisioning.',
-        },
-        {
-          title: 'Standardized OKD & OpenShift topology',
-          copy: 'Maintained parity between enterprise and upstream distributions for consistent deployment manifests and policies.',
-        },
-        {
-          title: 'Platform-service synergy',
-          copy: 'Designed cluster configuration directly around workload requirements, ensuring proper health probes, resource limits, and ingress routing.',
-        },
-      ],
-      limits: [
-        'Architected specifically for on-premise infrastructure constraints and dedicated virtualization environments.',
-      ],
-    },
-  },
-  {
-    number: '03',
-    slug: 'gitops-tekton',
-    scope: 'Delivery and security',
-    title: 'Tekton, Argo CD, and Trivy',
-    subtitle: 'Tekton · Argo CD · Helm · DevSecOps',
-    copy: 'Designed automated Tekton build pipelines, Trivy container security scans, and Argo CD GitOps delivery.',
-    metrics: ['Tekton CI pipelines', 'Argo CD + Helm GitOps'],
-    tags: ['Tekton', 'Argo CD', 'Helm', 'Trivy', 'Wazuh'],
-    detail:
-      'Engineered automated CI/CD pipelines using Tekton for containerized compilation, resource-isolated builds, and automated vulnerability scanning via Trivy. Configured Argo CD App-of-Apps and per-service applications with Helm for continuous declarative delivery on OpenShift. Integrated cluster-level security monitoring via Wazuh.',
-    outcome: 'Automated GitOps pipeline enabling declarative deployments and continuous security scanning from Git.',
-    role: 'Software engineer · Delivery & Security · Jan 2023–present',
-    caseStudy: {
-      proprietary: true,
-      problem:
-        'Manual deployments and unstandardized build environments caused build fragility, configuration drift, and late-stage security discovery.',
-      design:
-        'Built resilient Tekton pipeline tasks for containerized Java builds with memory isolation and single-threaded compilation. Integrated Trivy image scanning at build time. Established Argo CD GitOps architecture with environmental Helm values, webhook triggers, and Wazuh cluster monitoring.',
-      path:
-        'Git commit → automated webhook → Tekton build & Trivy scan → Argo CD declarative sync to OpenShift via Helm.',
-      constraints: [
-        'Internal repository URLs, pipeline timing benchmarks, and specific security finding logs are omitted.',
-      ],
-      decisions: [
-        {
-          title: 'Containerized, isolated build environments',
-          copy: 'Isolated build tasks eliminate host-level dependency leaks and stabilize compilation memory consumption.',
-        },
-        {
-          title: 'Declarative GitOps with Argo CD',
-          copy: 'Git remains the single source of truth for desired state, replacing manual kubectl/oc commands with automated reconciliation.',
-        },
-        {
-          title: 'Shift-left security scanning',
-          copy: 'Trivy scans container images before registry promotion, while Wazuh provides continuous runtime cluster monitoring.',
-        },
-      ],
-      limits: [
-        'GitOps ensures declarative state consistency but relies on rigorous Helm chart linting and environmental property validations.',
-      ],
-    },
-  },
-  {
-    number: '04',
     slug: 'quarkus-doctor',
-    scope: 'Personal project · GitHub',
+    scope: 'Open source · Maven plugin',
+    status: 'Early preview',
     title: 'quarkus-doctor',
     subtitle: 'quarkus-doctor · Maven plugin · CLI',
     copy: 'A Java CLI and Maven plugin that compares Quarkus config with Kubernetes, Helm, and Kustomize YAML in CI. No live cluster required.',
-    metrics: ['Public · early preview', 'Not on Maven Central'],
+    metrics: ['Fails mvn verify on config errors', 'JDK 11+ · no cluster needed'],
     tags: ['Quarkus', 'Maven', 'Kubernetes', 'Helm', 'Kustomize'],
     detail:
       'KubeLinter, Checkov, and Trivy never read Quarkus config. Quarkus itself only fails at startup. quarkus-doctor is a Java CLI plus a Maven plugin—JDK 11, no Node, no live cluster—that diffs application.properties / application.yaml against this repo’s Deployment, Helm, and Kustomize YAML in CI. Bind the scan to verify and the build fails on build-time ${VAR} with no default, secret defaults in Git, localhost JDBC in a manifest, trust-all TLS, CORS * with credentials, Swagger in prod. Green means no hits in the current rule set, not an audit. Early preview; not on Maven Central yet.',
@@ -232,6 +141,50 @@ export const projects: Project[] = [
         'If env is injected by another chart, ignore ENV_VAR_NOT_IN_MANIFEST.',
         'A scan with no findings is not a guarantee the app is production-safe.',
         'Helm --fix skips templates. Ignore lists live in .quarkus-doctor.yml.',
+      ],
+    },
+  },
+  {
+    number: '03',
+    slug: 'gitops-tekton',
+    scope: 'Delivery and security',
+    status: 'Production · private',
+    title: 'Tekton, Argo CD, and Trivy',
+    subtitle: 'Tekton · Argo CD · Helm · DevSecOps',
+    copy: 'Designed automated Tekton build pipelines, Trivy container security scans, and Argo CD GitOps delivery.',
+    metrics: ['Commit → Tekton → Trivy → Argo CD', 'Helm App-of-Apps'],
+    tags: ['Tekton', 'Argo CD', 'Helm', 'Trivy', 'Wazuh'],
+    detail:
+      'Engineered automated CI/CD pipelines using Tekton for containerized compilation, resource-isolated builds, and automated vulnerability scanning via Trivy. Configured Argo CD App-of-Apps and per-service applications with Helm for continuous declarative delivery on OpenShift. Integrated cluster-level security monitoring via Wazuh.',
+    outcome: 'Automated GitOps pipeline enabling declarative deployments and continuous security scanning from Git.',
+    role: 'Software engineer · Delivery & Security · Jan 2023–present',
+    caseStudy: {
+      proprietary: true,
+      problem:
+        'Manual deployments and unstandardized build environments caused build fragility, configuration drift, and late-stage security discovery.',
+      design:
+        'Built resilient Tekton pipeline tasks for containerized Java builds with memory isolation and single-threaded compilation. Integrated Trivy image scanning at build time. Established Argo CD GitOps architecture with environmental Helm values, webhook triggers, and Wazuh cluster monitoring.',
+      path:
+        'Git commit → automated webhook → Tekton build & Trivy scan → Argo CD declarative sync to OpenShift via Helm.',
+      constraints: [
+        'Internal repository URLs, pipeline timing benchmarks, and specific security finding logs are omitted.',
+      ],
+      decisions: [
+        {
+          title: 'Containerized, isolated build environments',
+          copy: 'Isolated build tasks eliminate host-level dependency leaks and stabilize compilation memory consumption.',
+        },
+        {
+          title: 'Declarative GitOps with Argo CD',
+          copy: 'Git remains the single source of truth for desired state, replacing manual kubectl/oc commands with automated reconciliation.',
+        },
+        {
+          title: 'Shift-left security scanning',
+          copy: 'Trivy scans container images before registry promotion, while Wazuh provides continuous runtime cluster monitoring.',
+        },
+      ],
+      limits: [
+        'GitOps ensures declarative state consistency but relies on rigorous Helm chart linting and environmental property validations.',
       ],
     },
   },
@@ -280,138 +233,6 @@ export const doctorRules = [
   { code: 'PLAINTEXT_DB_PASSWORD', level: 'error', meaning: 'Literal password in config, not ${VAR}.' },
 ] as const;
 
-export const stack: { number: string; title: string; copy: string; Icon: LucideIcon }[] = [
-  {
-    number: '01',
-    title: 'One service at a time',
-    copy: 'Quarkus services stay small enough that one module can ship without dragging the others.',
-    Icon: Braces,
-  },
-  {
-    number: '02',
-    title: 'The cluster is operated, not assumed',
-    copy: 'On-premise OpenShift and OKD clusters designed with high-availability control planes and automated operations.',
-    Icon: Container,
-  },
-  {
-    number: '03',
-    title: 'Release from Git',
-    copy: 'Tekton builds the commit. Argo CD syncs it. Rollback is another revision in Git.',
-    Icon: Radio,
-  },
-  {
-    number: '04',
-    title: 'Scan before the pod runs',
-    copy: 'Trivy runs in the pipeline. Keycloak and Wazuh handle access and monitoring.',
-    Icon: Network,
-  },
-];
-
-export type Technology = {
-  name: string;
-  label: string;
-  copy: string;
-  detail: string;
-  Icon: IconType;
-};
-
-export const technologies: Technology[] = [
-  {
-    name: 'Quarkus',
-    label: 'Java runtime',
-    copy: 'Fast startup. Small footprint.',
-    detail:
-      'Quarkus is the runtime for the backend services: fast boot, small image, health endpoints the cluster can use.',
-    Icon: SiQuarkus,
-  },
-  {
-    name: 'OpenShift',
-    label: 'Application platform',
-    copy: 'Enterprise Kubernetes platforms.',
-    detail:
-      'OpenShift and OKD provide the enterprise container platform, orchestration, security controls, and GitOps delivery pipelines.',
-    Icon: SiRedhatopenshift,
-  },
-  {
-    name: 'Kubernetes',
-    label: 'Cluster foundation',
-    copy: 'The primitives behind OpenShift and OKD.',
-    detail:
-      'Kubernetes is what OpenShift and OKD are built on. Same API objects on both installs.',
-    Icon: SiKubernetes,
-  },
-  {
-    name: 'Kafka',
-    label: 'Event backbone',
-    copy: 'Events between services, not direct calls.',
-    detail:
-      'Kafka carries events between services so they communicate through contracts, not coupling.',
-    Icon: SiApachekafka,
-  },
-];
-
-export type LifecycleStage = {
-  number: string;
-  name: string;
-  command: string;
-  copy: string;
-  outcome: string;
-  Icon: LucideIcon;
-};
-
-export const lifecycle: LifecycleStage[] = [
-  {
-    number: '01',
-    name: 'Design',
-    command: 'git checkout --track',
-    copy: 'Service boundary, Keycloak role, Kafka contract.',
-    outcome: 'A Quarkus service with a clear owner.',
-    Icon: GitBranch,
-  },
-  {
-    number: '02',
-    name: 'Build',
-    command: './mvnw quarkus:build',
-    copy: 'Compile, test, and scan with Trivy. Maven runs in a container with memory isolation.',
-    outcome: 'An image plus a Trivy report.',
-    Icon: Braces,
-  },
-  {
-    number: '03',
-    name: 'Promote',
-    command: 'argocd app sync',
-    copy: 'Argo CD App-of-Apps and Helm values sync that Git commit to OpenShift. Webhooks start Tekton.',
-    outcome: 'A GitOps rollout that can be rolled back in Git.',
-    Icon: Rocket,
-  },
-  {
-    number: '04',
-    name: 'Observe',
-    command: 'oc logs -f wazuh',
-    copy: 'Wazuh on the cluster for security monitoring and log analysis.',
-    outcome: 'Cluster logs and alerts in one place.',
-    Icon: Network,
-  },
-];
-
-export const principles: { title: string; copy: string; Icon: LucideIcon }[] = [
-  {
-    title: 'Platform as product',
-    copy: 'Standardized configurations and reproducible platform layouts designed for reliability and ease of operations.',
-    Icon: Cloud,
-  },
-  {
-    title: 'Reliability is a feature',
-    copy: 'Health checks, GitOps, and image scanning belong in the design, not as cleanup.',
-    Icon: ShieldCheck,
-  },
-  {
-    title: 'Curious, then practical',
-    copy: 'I try new tools when they make the next failure smaller, not because they are new.',
-    Icon: Cpu,
-  },
-];
-
 export const navItems = [
   {
     id: 'about',
@@ -420,7 +241,7 @@ export const navItems = [
     href: '/about/',
   },
   { id: 'experience', label: 'Experience', preview: 'Backend and platform engineering from Jan 2023. Node.js work before that.' },
-  { id: 'work', label: 'Work', preview: 'Four selected pieces of work: backend services, on-prem platforms, GitOps delivery, and a public Quarkus tool.' },
+  { id: 'work', label: 'Work', preview: 'Two open source tools — Migrax and quarkus-doctor — plus GitOps delivery on OpenShift.' },
   { id: 'now', label: 'Contact', preview: 'Email, phone, CV, GitHub, LinkedIn.' },
 ] as const;
 
