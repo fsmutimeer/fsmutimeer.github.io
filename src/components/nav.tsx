@@ -16,7 +16,7 @@ import { scrambleTo } from "@/lib/scramble";
 const homeSection = {
   id: "top",
   label: "Home",
-  preview: "Backend and platform engineer. Java, Quarkus, Kafka, and OpenShift.",
+  preview: "Software engineer and DevOps engineer. Java, Quarkus, Kafka, and OpenShift.",
   href: undefined,
 } as const;
 const sections = [homeSection, ...navItems] as const;
@@ -262,7 +262,7 @@ export function Nav({
                 {String(activeIndex).padStart(2, "0")} /{" "}
                 {String(navItems.length).padStart(2, "0")}
               </span>
-              <span className="status-copy">backend & platform</span>
+              <span className="status-copy">software & devops</span>
             </div>
           )}
           <button
@@ -356,7 +356,7 @@ export function Nav({
             </div>
             <p className="mono nav-overlay-kicker">currently</p>
             <p>
-              Backend & platform engineer
+              Software & DevOps engineer
               <br />
               {profile.location}
             </p>

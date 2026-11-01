@@ -28,19 +28,19 @@ const ogImage = {
   url: withBasePath("/og.png"),
   width: 1200,
   height: 630,
-  alt: `${profile.name} — Backend & Platform Engineer`,
+  alt: `${profile.name} — Software Engineer & DevOps Engineer`,
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fsmutimeer.github.io"),
-  title: `${profile.name} — Backend & Platform Engineer`,
-  description: `${profile.name} is a backend and platform engineer at IT22 B.V. in Islamabad, working with Java, Quarkus, Kafka, OpenShift, and OKD.`,
+  title: `${profile.name} — Software Engineer & DevOps Engineer`,
+  description: `${profile.name} is a software engineer and DevOps engineer at IT22 B.V. in Islamabad, working with Java, Quarkus, Kafka, OpenShift, and OKD.`,
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
   openGraph: {
-    title: `${profile.name} — Backend & Platform Engineer`,
+    title: `${profile.name} — Software Engineer & DevOps Engineer`,
     description:
-      "Backend and platform engineer at IT22 B.V. Java, Quarkus, Kafka, OpenShift, and OKD. Islamabad.",
+      "Software engineer and DevOps engineer at IT22 B.V. Java, Quarkus, Kafka, OpenShift, and OKD. Islamabad.",
     type: "website",
     url: "/",
     siteName: profile.name,
@@ -48,9 +48,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${profile.name} — Backend & Platform Engineer`,
+    title: `${profile.name} — Software Engineer & DevOps Engineer`,
     description:
-      "Backend and platform engineer at IT22 B.V. Java, Quarkus, Kafka, OpenShift, and OKD. Islamabad.",
+      "Software engineer and DevOps engineer at IT22 B.V. Java, Quarkus, Kafka, OpenShift, and OKD. Islamabad.",
     images: [ogImage.url],
   },
   icons: { icon: withBasePath("/favicon.svg") },
@@ -60,7 +60,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: profile.name,
-  jobTitle: "Backend & Platform Engineer",
+  jobTitle: "Software Engineer & DevOps Engineer",
   worksFor: {
     "@type": "Organization",
     name: "IT22 B.V.",
@@ -72,7 +72,7 @@ const jsonLd = {
     addressCountry: "PK",
   },
   description:
-    "Backend and platform engineer at IT22 B.V. building Java and Quarkus services, Kafka event flows, and OpenShift / OKD platforms.",
+    "Software engineer and DevOps engineer at IT22 B.V. building Java and Quarkus services, Kafka event flows, and OpenShift / OKD platforms.",
   email: `mailto:${profile.email}`,
   telephone: profile.phoneHref.replace("tel:", ""),
   url: "https://fsmutimeer.github.io/",

@@ -195,7 +195,7 @@ export const experience: ExperienceRole[] = [
     id: 'it22',
     company: 'IT22 B.V.',
     companyUrl: 'https://it22.nl/',
-    role: 'Software engineer · backend & platform',
+    role: 'Software engineer · DevOps engineer',
     location: 'Islamabad, Pakistan',
     dates: 'Jan 2023 – present',
     bullets: [
@@ -240,7 +240,7 @@ export const navItems = [
     preview: 'Kalash, photography, IT, and the mountains still called home.',
     href: '/about/',
   },
-  { id: 'experience', label: 'Experience', preview: 'Backend and platform engineering from Jan 2023. Node.js work before that.' },
+  { id: 'experience', label: 'Experience', preview: 'Software and DevOps engineering from Jan 2023. Node.js work before that.' },
   { id: 'work', label: 'Work', preview: 'Two open source tools — Migrax and quarkus-doctor — plus GitOps delivery on OpenShift.' },
   { id: 'now', label: 'Contact', preview: 'Email, phone, CV, GitHub, LinkedIn.' },
 ] as const;
